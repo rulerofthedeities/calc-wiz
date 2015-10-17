@@ -1,0 +1,6 @@
+.navbar-inverse .navbar-brand{
+	color:#ffffff;
+}
+.navbar-collapse.in {
+    overflow-y: hidden;
+}

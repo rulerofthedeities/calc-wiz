@@ -1,0 +1,25 @@
+{
+  "name": "calc-wiz",
+  "homepage": "https://github.com/rulerofthedeities/calc-wiz",
+  "authors": [
+    "Kristiaan Van Ermengem"
+  ],
+  "description": "Arithmetics tests",
+  "main": "calc.htm",
+  "moduleType": [],
+  "keywords": [
+    "Arithmetics"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-bootstrap": "~0.14.2"
+  }
+}
