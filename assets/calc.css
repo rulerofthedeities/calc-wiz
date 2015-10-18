@@ -4,3 +4,11 @@
 .navbar-collapse.in {
     overflow-y: hidden;
 }
+.nav a { cursor: pointer; }
+.subnav{
+	list-style: none;
+}
+span.icon {
+  font-family: FontAwesome;
+  line-height:18px;
+} 

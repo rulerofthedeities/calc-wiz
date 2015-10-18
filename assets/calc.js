@@ -11,7 +11,10 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 .directive("calcMenu", function(){
 	return{
 		restrict: 'E',
-		templateUrl: 'directives/menu.htm'
+		templateUrl: 'directives/menu.htm',
+		controller: function($scope){
+			$scope.isMenuCollapsed = true;
+		}
 	};
 })
 
@@ -21,7 +24,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		templateUrl: 'directives/header.htm',
 		scope: {title:'@'},
 		controller: function($scope){
-			$scope.isCollapsed = true;
+			$scope.isHeaderCollapsed = true;
 		}
 	};
 });
