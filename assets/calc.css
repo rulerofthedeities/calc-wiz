@@ -11,4 +11,23 @@
 span.icon {
   font-family: FontAwesome;
   line-height:18px;
-} 
+}
+.navbar-brand{
+	font-size: 36px;
+}
+/* question */
+#exercise{
+	margin:0 auto;
+	width:200px;
+	float:none;
+	display:block;
+}
+#question{
+	font-family: "Lucida Console", Monaco, monospace;
+	font-size:64px;
+	line-height: 70px;
+	text-align: right;
+}
+.term2{
+	text-decoration: underline;
+}

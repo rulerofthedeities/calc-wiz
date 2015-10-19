@@ -1,3 +1,9 @@
+# Source files
+source
+
+# PSDs
+*.psd
+
 # Logs
 logs
 *.log

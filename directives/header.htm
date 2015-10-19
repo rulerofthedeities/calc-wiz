@@ -1,4 +1,5 @@
 <header class="navbar navbar-inverse">
+	<div id="appLogo" class="pull-left"><a href="#/"><img src="./assets/img/logo.png" alt="Home"></a></div>
 	<div class="navbar-header">
 		<button type="button" ng-click="isHeaderCollapsed = !isHeaderCollapsed" class="navbar-toggle">
             <span class="sr-only">Toggle navigation</span>
@@ -8,8 +9,7 @@
         </button>
 		<span class="navbar-brand">{{title}}</span>
 	</div>
-	
-	<div uib-collapse="isHeaderCollapsed" class="collapse navbar-collapse">
+	<nav uib-collapse="isHeaderCollapsed" class="collapse navbar-collapse">
 		<ul class="nav navbar-nav">
 			<li><a href="#/results"><i class="fa fa-file-o"></i> Results</a></li>
 			<li><a href="#/config"><i class="fa fa-wrench"></i> Configuration</a></li>
@@ -17,6 +17,6 @@
 		<ul class="nav navbar-nav navbar-right">
 			<li><a href="#/login"><i class="fa fa-unlock"></i> Login</a></li>
 		</ul>
-	</div>
+	</nav>
 
 </header>
