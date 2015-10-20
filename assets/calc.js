@@ -1,4 +1,4 @@
-angular.module("calc", ['ngRoute', 'ui.bootstrap'])
+angular.module("calc", ['ngRoute', 'ui.bootstrap', 'ui.mask'])
 
 .config(function($routeProvider){
 	$routeProvider.when('/', {

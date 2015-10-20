@@ -36,6 +36,9 @@ form#answer{
 input[name=answer]{
 	width:200px;
 	direction: rtl;
+	border:none;
+	outline: 0;
+	color:blue;
 }
 #clear{
 	position:relative;
