@@ -4,6 +4,14 @@
 		<div id="question">
 			<div class="term">{{question.terms[1]}}</div>
 			<div class="term term2"><span id="operator">{{question.operator}}</span>{{question.terms[2]}}</div>
+			<form>
+				<label class="sr-only" for="answer">Answer</label>
+				<input dir="rtl" name="answer" autofocus focus onkeyup="UI.rtl(this);">
+				<i id="clear" class="fa fa-times pull-right" onClick="UI.clearField('answer')"></i>
+				<button type="button" class="btn btn-success btn-lg" >Submit Answer</button> 
+				
+			</form>
+
 		</div>
 	</div> 
 </div>

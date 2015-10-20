@@ -38,9 +38,13 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			$scope.nr = 1;
 			$scope.maxNr = 10;
 			$scope.question = Questions.getQuestion($scope.type);
+		},
+		link: function(){
+
 		}
 	};
 });
+
 
 
 var Config = {
@@ -76,5 +80,17 @@ Utils = {
 	pad: function(str, padding, len){
 		str = Array(len + 1).join(padding) + str;
 		return (str.slice(-len));
+	}
+},
+UI = {
+	rtl: function(element){
+	    if(element.setSelectionRange){
+	        element.setSelectionRange(0, 0, "backward");
+	    }
+	},
+	clearField:function(fieldName){
+		var element = document.getElementsByName(fieldName)[0];
+		element.value = "";
+		element.focus();
 	}
 };

@@ -31,3 +31,17 @@ span.icon {
 .term2{
 	text-decoration: underline;
 }
+form#answer{
+}
+input[name=answer]{
+	width:200px;
+	direction: rtl;
+}
+#clear{
+	position:relative;
+	font-size:64px;
+	top:-30px;
+	left:60px;
+	line-height: 10px;
+	color:red;
+}
