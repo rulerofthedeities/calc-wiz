@@ -40,7 +40,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			$scope.question = Questions.getQuestion($scope.type);
 			$scope.clearField = function(fieldName){
 				$scope[fieldName] = "";
-
+				$scope.setFocus = true;
 			};
 			$scope.setCursor = function($event) {
 				var element = $event.target;
@@ -53,12 +53,25 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 				if (parseInt(answer,10) === $scope.question.answer){
 					console.log("correct");
 					$scope.question = Questions.nextQuestion($scope);
+					$scope.setFocus = true;
 				} else {
 					console.log("incorrect");
 				}
 			};
 		}
 	};
+})
+
+.directive('autoFocus', function($timeout) {
+    return {
+        restrict: 'AC',
+        link: function(scope, element, attr) {
+        	scope.$watch('setFocus', function() {
+				element[0].focus();
+				scope.setFocus= false;
+			});
+        }
+    };
 });
 
 
