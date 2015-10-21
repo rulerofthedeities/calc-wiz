@@ -47,7 +47,7 @@ input[name=answer]{
 #clear{
 	position:relative;
 	font-size:64px;
-	top:-30px;
+	top:-40px;
 	left:60px;
 	line-height: 10px;
 	color:red;

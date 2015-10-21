@@ -1,4 +1,4 @@
-angular.module("calc", ['ngRoute', 'ui.bootstrap', 'ui.mask'])
+angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 
 .config(function($routeProvider){
 	$routeProvider.when('/', {
@@ -40,12 +40,22 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap', 'ui.mask'])
 			$scope.question = Questions.getQuestion($scope.type);
 			$scope.clearField = function(fieldName){
 				$scope[fieldName] = "";
+
 			};
 			$scope.setCursor = function($event) {
 				var element = $event.target;
 				if(element.setSelectionRange){
 					element.setSelectionRange(0, 0, "backward");
 		    	}
+			};
+			$scope.submitAnswer = function(answer){
+
+				if (parseInt(answer,10) === $scope.question.answer){
+					console.log("correct");
+					$scope.question = Questions.nextQuestion($scope);
+				} else {
+					console.log("incorrect");
+				}
 			};
 		}
 	};
@@ -56,10 +66,10 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap', 'ui.mask'])
 var Config = {
 	range:{addition: {min: 101, max: 9999}},
 	operator:{
-		addition: '+',
-		subtraction: '-',
-		division: '&#xf7;',
-		multiplication: 'x'
+		addition: {label:'+', operator:'+'},
+		subtraction: {label:'-', operator:'-'},
+		division: {label: '&#xf7;', operator: '/'},
+		multiplication: {label:'x', operator:'*'}
 	}
 },
 Questions = {
@@ -74,9 +84,15 @@ Questions = {
 				1: Utils.pad(term1, " ", len), 
 				2: Utils.pad(term2, " ", len)
 			},
-			operator: Config.operator[tpe],
-			len: len
+			operator: Config.operator[tpe].label,
+			len: len,
+			answer: eval(term1 + Config.operator[tpe].operator + term2)
 		};
+	},
+	nextQuestion: function(scope){
+		scope.nr++;
+		scope.answer = "";
+		return Questions.getQuestion(scope.type);
 	}
 },
 Utils = {

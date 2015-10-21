@@ -4,13 +4,12 @@
 		<div id="question">
 			<div class="term">{{question.terms[1]}}</div>
 			<div class="term term2"><span id="operator">{{question.operator}}</span>{{question.terms[2]}}</div>
-			<form novalidate>
+			<form name="answerForm" ng-submit="submitAnswer(answer)" novalidate>
 				<label class="sr-only" for="answer">Answer</label>
-				<input name="answer" ng-model="answer" autofocus ng-keyup="setCursor($event);" ui-mask="999999">
-				<i id="clear" class="fa fa-times pull-right" ng-click="clearField('answer');"></i>
-				<button type="button" class="btn btn-success btn-lg" >Submit Answer</button> 
+				<input name="answer" ng-model="answer" autofocus autocomplete="off" ng-keyup="setCursor($event)">
+				<i id="clear" class="fa fa-times pull-right" ng-click="clearField('answer')"></i>
+				<button type="submit" class="btn btn-success btn-lg">Submit Answer</button> 
 			</form>
-
 		</div>
 	</div> 
 </div>
