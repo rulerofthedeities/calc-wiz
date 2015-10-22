@@ -1,11 +1,54 @@
 angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 
+.value("settings", {
+	range:{addition: {min: 101, max: 9999}},
+	operator:{
+		addition: {label:'+', operator:'+'},
+		subtraction: {label:'-', operator:'-'},
+		division: {label: '&#xf7;', operator: '/'},
+		multiplication: {label:'x', operator:'*'}
+	}
+})
+
 .config(function($routeProvider){
 	$routeProvider.when('/', {
 		templateUrl: 'views/menu.htm'
 	}).when('/addition', {
 		templateUrl: 'views/addition.htm'
 	}).otherwise({redirectTo: '/'});
+})
+
+.factory("utils", function(){
+	return {
+		getRandomInt : function(min, max) {
+			return Math.floor(Math.random() * (max - min + 1)) + min;
+		},
+		pad: function(str, padding, len){
+			str = Array(len + 1).join(padding) + str;
+			return (str.slice(-len));
+		}
+	};
+})
+
+.factory("questions", function(settings, utils){
+	return {
+		getQuestion: function(tpe){
+			var range = settings.range[tpe],
+			term1 = utils.getRandomInt(range.min, range.max),
+			term2 = utils.getRandomInt(range.min, range.max),
+			len = Math.max(term1.toString().length, term2.toString().length);
+
+			return {
+				terms: {
+					1: utils.pad(term1, " ", len), 
+					2: utils.pad(term2, " ", len)
+				},
+				operator: settings.operator[tpe].label,
+				len: len,
+				answer: eval(term1 + settings.operator[tpe].operator + term2)
+			};
+		}
+	};
 })
 
 .directive("calcMenu", function(){
@@ -34,11 +77,11 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		restrict: 'E',
 		templateUrl: 'directives/exercise.htm',
 		scope: {type:'@'},
-		controller: function($scope){
+		controller: function($scope, questions){
 			$scope.nr = 1;
 			$scope.maxNr = 10;
 			$scope.correct = [];
-			$scope.question = Questions.getQuestion($scope.type);
+			$scope.question = questions.getQuestion($scope.type);
 			$scope.clearField = function(fieldName){
 				$scope[fieldName] = "";
 				$scope.setFocus = true;
@@ -50,9 +93,10 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		    	}
 			};
 			$scope.submitAnswer = function(answer){
-				if (parseInt(answer,10) === $scope.question.answer){
+				if (parseInt(answer, 10) === $scope.question.answer){
 					console.log("correct");
-					$scope.question = Questions.nextQuestion($scope);
+					$scope.question = questions.getQuestion($scope.type);
+					$scope.answer = "";
 					$scope.setFocus = true;
 					$scope.correct[$scope.nr - 1] = true;
 				} else {
@@ -83,49 +127,4 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
         templateUrl: 'directives/progress.htm'
     };
 });
-
-
-
-var Config = {
-	range:{addition: {min: 101, max: 9999}},
-	operator:{
-		addition: {label:'+', operator:'+'},
-		subtraction: {label:'-', operator:'-'},
-		division: {label: '&#xf7;', operator: '/'},
-		multiplication: {label:'x', operator:'*'}
-	}
-},
-Questions = {
-	getQuestion: function(tpe){
-		var range = Config.range[tpe],
-			term1 = Utils.getRandomInt(range.min, range.max),
-			term2 = Utils.getRandomInt(range.min, range.max),
-			len = Math.max(term1.toString().length, term2.toString().length);
-
-		return {
-			terms: {
-				1: Utils.pad(term1, " ", len), 
-				2: Utils.pad(term2, " ", len)
-			},
-			operator: Config.operator[tpe].label,
-			len: len,
-			answer: eval(term1 + Config.operator[tpe].operator + term2)
-		};
-	},
-	nextQuestion: function(scope){
-		scope.answer = "";
-		return Questions.getQuestion(scope.type);
-	}
-},
-Utils = {
-	getRandomInt: function(min, max) {
-	return Math.floor(Math.random() * (max - min + 1)) + min;
-	},
-	pad: function(str, padding, len){
-		str = Array(len + 1).join(padding) + str;
-		return (str.slice(-len));
-	}
-},
-UI = {
-};
 
