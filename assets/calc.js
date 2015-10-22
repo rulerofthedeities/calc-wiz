@@ -7,7 +7,8 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		subtraction: {label:'-', operator:'-'},
 		division: {label: '&#xf7;', operator: '/'},
 		multiplication: {label:'x', operator:'*'}
-	}
+	},
+	btnMessage: {active: "Submit Answer", inActive: "Next Question"}
 })
 
 .config(function($routeProvider){
@@ -77,10 +78,12 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		restrict: 'E',
 		templateUrl: 'directives/exercise.htm',
 		scope: {type:'@'},
-		controller: function($scope, questions){
+		controller: function($scope, questions, settings){
 			$scope.nr = 1;
 			$scope.maxNr = 10;
 			$scope.correct = [];
+			$scope.isWrongAnswer = false;
+			$scope.btnMessage = settings.btnMessage.active;
 			$scope.question = questions.getQuestion($scope.type);
 			$scope.clearField = function(fieldName){
 				$scope[fieldName] = "";
@@ -93,17 +96,28 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		    	}
 			};
 			$scope.submitAnswer = function(answer){
-				if (parseInt(answer, 10) === $scope.question.answer){
-					console.log("correct");
-					$scope.question = questions.getQuestion($scope.type);
-					$scope.answer = "";
-					$scope.setFocus = true;
-					$scope.correct[$scope.nr - 1] = true;
+				if ($scope.isWrongAnswer){
+					$scope.nextQuestion();
 				} else {
-					console.log("incorrect");
-					$scope.correct[$scope.nr - 1] = false;
+					if (parseInt(answer, 10) === $scope.question.answer){
+						console.log("correct");
+						$scope.correct[$scope.nr - 1] = true;
+						$scope.nextQuestion();
+					} else {
+						console.log("incorrect");
+						$scope.correct[$scope.nr - 1] = false;
+						$scope.isWrongAnswer = true;
+						$scope.btnMessage = settings.btnMessage.inActive;
+					}
+					$scope.nr++;
 				}
-				$scope.nr++;
+			};
+			$scope.nextQuestion = function(){
+				$scope.isWrongAnswer = false;
+				$scope.btnMessage = settings.btnMessage.active;
+				$scope.question = questions.getQuestion($scope.type);
+				$scope.answer = "";
+				$scope.setFocus = true;
 			};
 		}
 	};

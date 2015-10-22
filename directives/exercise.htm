@@ -9,9 +9,10 @@
 			<div class="term term2"><span id="operator">{{question.operator}}</span>{{question.terms[2]}}</div>
 			<form name="answerForm" ng-submit="submitAnswer(answer)" novalidate>
 				<label class="sr-only" for="answer">Answer</label>
-				<input name="answer" ng-model="answer" auto-focus autocomplete="off" ng-keyup="setCursor($event)">
-				<i id="clear" class="fa fa-times pull-right" ng-click="clearField('answer')"></i>
-				<button type="submit" class="btn btn-success btn-lg">Submit Answer</button> 
+				<input name="answer" ng-model="answer" auto-focus autocomplete="off" ng-keyup="setCursor($event)" ng-class="{'red':isWrongAnswer}" ng-disabled="isWrongAnswer">
+				<i id="clear" class="fa fa-times pull-right" ng-hide="isWrongAnswer" ng-click="clearField('answer')"></i>
+				<div ng-hide="!isWrongAnswer" class="msg text-danger">The correct answer is: {{question.answer}}</div>
+				<button type="submit" class="btn btn-success btn-lg">{{btnMessage}}</button> 
 			</form>
 		</div>
 	</div> 

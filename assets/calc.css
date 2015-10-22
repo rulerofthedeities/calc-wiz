@@ -44,7 +44,9 @@ span.icon {
 .term2{
 	text-decoration: underline;
 }
-form#answer{
+.msg{
+	font-size:16px;
+	line-height:18px;
 }
 input[name=answer]{
 	width:200px;
@@ -52,6 +54,9 @@ input[name=answer]{
 	border:none;
 	outline: 0;
 	color:blue;
+}
+input[name=answer].red{
+	color:red;
 }
 #clear{
 	position:relative;
