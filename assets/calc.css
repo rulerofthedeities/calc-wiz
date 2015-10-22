@@ -19,13 +19,22 @@ span.icon {
 .navbar-brand{
 	font-size: 36px;
 }
+.navbar {
+    margin-bottom: 0;
+}
 /* question */
 #exercise{
 	margin:0 auto;
 	width:200px;
 	float:none;
 	display:block;
+	margin-top:30px;
 }
+.subHeader{
+	border:1px solid grey;
+}
+.nok{color:red;}
+.ok{color:green;}
 #question{
 	font-family: "Lucida Console", Monaco, monospace;
 	font-size:64px;

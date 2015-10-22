@@ -37,6 +37,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		controller: function($scope){
 			$scope.nr = 1;
 			$scope.maxNr = 10;
+			$scope.correct = [];
 			$scope.question = Questions.getQuestion($scope.type);
 			$scope.clearField = function(fieldName){
 				$scope[fieldName] = "";
@@ -49,28 +50,37 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		    	}
 			};
 			$scope.submitAnswer = function(answer){
-
 				if (parseInt(answer,10) === $scope.question.answer){
 					console.log("correct");
 					$scope.question = Questions.nextQuestion($scope);
 					$scope.setFocus = true;
+					$scope.correct[$scope.nr - 1] = true;
 				} else {
 					console.log("incorrect");
+					$scope.correct[$scope.nr - 1] = false;
 				}
+				$scope.nr++;
 			};
 		}
 	};
 })
 
-.directive('autoFocus', function($timeout) {
+.directive('autoFocus', function() {
     return {
         restrict: 'AC',
         link: function(scope, element, attr) {
         	scope.$watch('setFocus', function() {
 				element[0].focus();
-				scope.setFocus= false;
+				scope.setFocus = false;
 			});
         }
+    };
+})
+
+.directive('exerciseProgress', function() {
+    return {
+        restrict: 'E',
+        templateUrl: 'directives/progress.htm'
     };
 });
 
@@ -103,7 +113,6 @@ Questions = {
 		};
 	},
 	nextQuestion: function(scope){
-		scope.nr++;
 		scope.answer = "";
 		return Questions.getQuestion(scope.type);
 	}
@@ -119,3 +128,4 @@ Utils = {
 },
 UI = {
 };
+
