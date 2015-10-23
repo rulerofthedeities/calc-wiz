@@ -1,6 +1,7 @@
 angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 
 .value("settings", {
+	nrOfQuestions: 5,
 	range:{addition: {min: 101, max: 9999}},
 	operator:{
 		addition: {label:'+', operator:'+'},
@@ -52,9 +53,26 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 	};
 })
 
+.service("results", function(){
+	this.results = [];
+	this.addResult = function(question, answer, correct, nr){
+		var result = {
+			nr: nr + 1,
+			question: question, 
+			answer: answer,
+			correct: correct
+		};
+		this.results.push(result);
+	};
+	this.getResults = function(){
+		return this.results;
+	};
+})
+
 .directive("calcMenu", function(){
 	return{
 		restrict: 'E',
+		replace: true,
 		templateUrl: 'directives/menu.htm',
 		controller: function($scope){
 			$scope.isMenuCollapsed = true;
@@ -65,6 +83,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 .directive("calcHeader", function(){
 	return{
 		restrict: 'E',
+		replace: true,
 		templateUrl: 'directives/header.htm',
 		scope: {title:'@'},
 		controller: function($scope){
@@ -76,11 +95,12 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 .directive("calcExercise", function(){
 	return {
 		restrict: 'E',
+		replace: true,
 		templateUrl: 'directives/exercise.htm',
 		scope: {type:'@'},
-		controller: function($scope, questions, settings){
+		controller: function($scope, settings, questions, results){
 			$scope.nr = 1;
-			$scope.maxNr = 10;
+			$scope.maxNr = settings.nrOfQuestions;
 			$scope.correct = [];
 			$scope.isWrongAnswer = false;
 			$scope.btnMessage = settings.btnMessage.active;
@@ -99,12 +119,13 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 				if ($scope.isWrongAnswer){
 					$scope.nextQuestion();
 				} else {
+					$scope.question.nr = $scope.nr;
 					if (parseInt(answer, 10) === $scope.question.answer){
-						console.log("correct");
+						results.addResult($scope.question, answer, true, $scope.nr);
 						$scope.correct[$scope.nr - 1] = true;
 						$scope.nextQuestion();
 					} else {
-						console.log("incorrect");
+						results.addResult($scope.question, answer, false, $scope.nr);
 						$scope.correct[$scope.nr - 1] = false;
 						$scope.isWrongAnswer = true;
 						$scope.btnMessage = settings.btnMessage.inActive;
@@ -113,11 +134,17 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 				}
 			};
 			$scope.nextQuestion = function(){
-				$scope.isWrongAnswer = false;
-				$scope.btnMessage = settings.btnMessage.active;
-				$scope.question = questions.getQuestion($scope.type);
-				$scope.answer = "";
-				$scope.setFocus = true;
+				if ($scope.nr < settings.nrOfQuestions){
+					$scope.isWrongAnswer = false;
+					$scope.btnMessage = settings.btnMessage.active;
+					$scope.question = questions.getQuestion($scope.type);
+					$scope.answer = "";
+					$scope.setFocus = true;
+				} else {
+					console.log("get results");
+					var res = results.getResults();
+					console.log(res);
+				}
 			};
 		}
 	};
@@ -138,6 +165,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 .directive('exerciseProgress', function() {
     return {
         restrict: 'E',
+        replace: true,
         templateUrl: 'directives/progress.htm'
     };
 });
