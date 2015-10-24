@@ -1,7 +1,7 @@
 angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 
 .value("settings", {
-	nrOfQuestions: 5,
+	nrOfQuestions: 3,
 	range:{addition: {min: 101, max: 9999}},
 	operator:{
 		addition: {label:'+', operator:'+'},
@@ -55,11 +55,11 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 
 .service("results", function(){
 	this.results = [];
-	this.addResult = function(question, answer, correct, nr){
+	this.addResult = function(question, correct, nr){
 		var result = {
 			nr: nr + 1,
 			question: question, 
-			answer: answer,
+			answer: question.useranswer,
 			correct: correct
 		};
 		this.results.push(result);
@@ -92,6 +92,22 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 	};
 })
 
+.directive("panelView", function(){
+	return{
+		restrict: 'A',
+		controller: function($scope){ 
+			$scope.subview = "question";
+	    	$scope.$watch('subview', function() {
+				console.log("subview changed");	
+			});
+			$scope.changeView = function(newView){
+				console.log("changing subview");	
+				$scope.subview = newView;
+			};
+		}
+	};
+})
+
 .directive("calcExercise", function(){
 	return {
 		restrict: 'E',
@@ -100,13 +116,14 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		scope: {type:'@'},
 		controller: function($scope, settings, questions, results){
 			$scope.nr = 1;
+			$scope.subview = "question";
 			$scope.maxNr = settings.nrOfQuestions;
 			$scope.correct = [];
 			$scope.isWrongAnswer = false;
 			$scope.btnMessage = settings.btnMessage.active;
 			$scope.question = questions.getQuestion($scope.type);
 			$scope.clearField = function(fieldName){
-				$scope[fieldName] = "";
+				$scope.question[fieldName] = "";
 				$scope.setFocus = true;
 			};
 			$scope.setCursor = function($event) {
@@ -120,12 +137,12 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 					$scope.nextQuestion();
 				} else {
 					$scope.question.nr = $scope.nr;
-					if (parseInt(answer, 10) === $scope.question.answer){
-						results.addResult($scope.question, answer, true, $scope.nr);
+					if (parseInt($scope.question.useranswer, 10) === $scope.question.answer){
+						results.addResult($scope.question, true, $scope.nr);
 						$scope.correct[$scope.nr - 1] = true;
 						$scope.nextQuestion();
 					} else {
-						results.addResult($scope.question, answer, false, $scope.nr);
+						results.addResult($scope.question, false, $scope.nr);
 						$scope.correct[$scope.nr - 1] = false;
 						$scope.isWrongAnswer = true;
 						$scope.btnMessage = settings.btnMessage.inActive;
@@ -137,12 +154,13 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 				if ($scope.nr < settings.nrOfQuestions){
 					$scope.isWrongAnswer = false;
 					$scope.btnMessage = settings.btnMessage.active;
-					$scope.question = questions.getQuestion($scope.type);
-					$scope.answer = "";
+					$scope.question.useranswer = "";
 					$scope.setFocus = true;
+					$scope.question = questions.getQuestion($scope.type);
 				} else {
 					console.log("get results");
 					var res = results.getResults();
+					$scope.subview = "results";
 					console.log(res);
 				}
 			};
