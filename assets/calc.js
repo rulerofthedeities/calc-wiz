@@ -1,7 +1,7 @@
 angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 
 .value("settings", {
-	nrOfQuestions: 3,
+	nrOfQuestions: 5,
 	range:{addition: {min: 101, max: 9999}},
 	operator:{
 		addition: {label:'+', operator:'+'},
@@ -54,7 +54,9 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 })
 
 .service("results", function(){
-	this.results = [];
+	this.init = function(){
+		this.results = {questions:[]};
+	};
 	this.addResult = function(question, correct, nr){
 		var result = {
 			nr: nr + 1,
@@ -62,9 +64,22 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			answer: question.useranswer,
 			correct: correct
 		};
-		this.results.push(result);
+		this.results.questions.push(result);
+	};
+	this._processResults = function(){
+		for(var indx = 0, countCorrect = 0; indx < this.results.questions.length; indx++){
+			if(this.results.questions[indx].correct) {
+				countCorrect++;
+			}
+		}
+		this.results.totals = {
+			nrOfQuestions: this.results.questions.length,
+			correct: countCorrect,
+			percentage: countCorrect / this.results.questions.length * 100
+		};
 	};
 	this.getResults = function(){
+		this._processResults();
 		return this.results;
 	};
 })
@@ -112,7 +127,8 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		scope: {type:'@'},
     	bindToController: true,
     	controllerAs: 'ctrl',
-		controller: function($scope, settings, questions, results){
+		controller: function(settings, questions, results){
+			results.init();
 			this.nr = 1;
 			this.subview = "question";
 			this.maxNr = settings.nrOfQuestions;
@@ -146,7 +162,6 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 						this.isWrongAnswer = true;
 						this.btnMessage = settings.btnMessage.inActive;
 					}
-					this.nr++;
 				}
 			};
 			this.nextQuestion = function(){
@@ -156,11 +171,10 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 					this.question.useranswer = "";
 					this.setFocus = true;
 					this.question = questions.getQuestion(this.type);
+					this.nr++;
 				} else {
-					console.log("get results");
-					var res = results.getResults();
+					this.results = results.getResults();
 					this.subview = "results";
-					console.log(res);
 				}
 			};
 		}
@@ -186,6 +200,15 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
         replace: true,
         scope: {correct:'='},
         templateUrl: 'directives/progress.htm'
+    };
+})
+
+.directive('exerciseResults', function() {
+    return {
+        restrict: 'E',
+        replace: true,
+        scope: {results:'='}, 
+        templateUrl: 'directives/result.htm'
     };
 });
 

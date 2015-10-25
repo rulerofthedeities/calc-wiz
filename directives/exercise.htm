@@ -1,10 +1,10 @@
-<div id="{{type}}" class="exercise">
+<div id="{{type}}">
 	<div ng-switch="ctrl.subview" panel-view> 
 		<div ng-switch-when="question">
 			<div ng-include="'views/sub/question.htm'"></div> 
 		</div>
 		<div ng-switch-when="results">
-			<div ng-include="'views/sub/result.htm'"></div> 
+			<exercise-results results="ctrl.results"></exercise-results>
 		</div>
 	</div>
 </div>
