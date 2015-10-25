@@ -1,28 +1,10 @@
 <div id="{{type}}" class="exercise">
-	<div ng-switch="subview" panel-view> 
+	<div ng-switch="ctrl.subview" panel-view> 
 		<div ng-switch-when="question">
-			<div class="subHeader">
-				<div class="pull-left">Question {{nr}}/{{maxNr}}</div>
-				<div class="pull-right"><exercise-progress></exercise-progress></div>
-			</div>
-			<div id="exercise">
-				<div id="question">
-					<div class="term">{{question.terms[1]}}</div>
-					<div class="term term2"><span id="operator">{{question.operator}}</span>{{question.terms[2]}}</div>
-					<form name="answerForm" ng-submit="submitAnswer(answer)" novalidate>
-						<label class="sr-only" for="answer">Answer</label>
-						<input name="answer" ng-model="question.useranswer" auto-focus autocomplete="off" ng-keyup="setCursor($event)" ng-class="{'red':isWrongAnswer}" ng-disabled="isWrongAnswer">
-						<i id="clear" class="fa fa-times pull-right" ng-hide="isWrongAnswer" ng-click="clearField('useranswer')"></i>
-						<div ng-hide="!isWrongAnswer" class="msg text-danger">The correct answer is: {{question.answer}}</div>
-						<button type="submit" class="btn btn-success btn-lg">{{btnMessage}}</button> 
-					</form>
-				</div>
-			</div> 
+			<div ng-include="'views/sub/question.htm'"></div> 
 		</div>
-		<div ng-switch-when="result">
-			<div ng-include="views/sub/result.htm" ></div> 
+		<div ng-switch-when="results">
+			<div ng-include="'views/sub/result.htm'"></div> 
 		</div>
-		<button class"btn btn-default" ng-click="changeView('result')">test</button>
-	{{subview}}
 	</div>
 </div>

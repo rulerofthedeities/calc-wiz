@@ -97,11 +97,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		restrict: 'A',
 		controller: function($scope){ 
 			$scope.subview = "question";
-	    	$scope.$watch('subview', function() {
-				console.log("subview changed");	
-			});
 			$scope.changeView = function(newView){
-				console.log("changing subview");	
 				$scope.subview = newView;
 			};
 		}
@@ -114,53 +110,56 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		replace: true,
 		templateUrl: 'directives/exercise.htm',
 		scope: {type:'@'},
+    	bindToController: true,
+    	controllerAs: 'ctrl',
 		controller: function($scope, settings, questions, results){
-			$scope.nr = 1;
-			$scope.subview = "question";
-			$scope.maxNr = settings.nrOfQuestions;
-			$scope.correct = [];
-			$scope.isWrongAnswer = false;
-			$scope.btnMessage = settings.btnMessage.active;
-			$scope.question = questions.getQuestion($scope.type);
-			$scope.clearField = function(fieldName){
-				$scope.question[fieldName] = "";
+			this.nr = 1;
+			this.subview = "question";
+			this.maxNr = settings.nrOfQuestions;
+			this.correct = [];
+			this.isWrongAnswer = false;
+			this.btnMessage = settings.btnMessage.active;
+			this.question = questions.getQuestion(this.type);
+			this.clearField = function(fieldName){
+				this.question[fieldName] = "";
+				this.setFocus = true;
 				$scope.setFocus = true;
 			};
-			$scope.setCursor = function($event) {
+			this.setCursor = function($event) {
 				var element = $event.target;
 				if(element.setSelectionRange){
 					element.setSelectionRange(0, 0, "backward");
 		    	}
 			};
-			$scope.submitAnswer = function(answer){
-				if ($scope.isWrongAnswer){
-					$scope.nextQuestion();
+			this.submitAnswer = function(answer){
+				if (this.isWrongAnswer){
+					this.nextQuestion();
 				} else {
-					$scope.question.nr = $scope.nr;
-					if (parseInt($scope.question.useranswer, 10) === $scope.question.answer){
-						results.addResult($scope.question, true, $scope.nr);
-						$scope.correct[$scope.nr - 1] = true;
-						$scope.nextQuestion();
+					this.question.nr = this.nr;
+					if (parseInt(this.question.useranswer, 10) === this.question.answer){
+						results.addResult(this.question, true, this.nr);
+						this.correct[this.nr - 1] = true;
+						this.nextQuestion();
 					} else {
-						results.addResult($scope.question, false, $scope.nr);
-						$scope.correct[$scope.nr - 1] = false;
-						$scope.isWrongAnswer = true;
-						$scope.btnMessage = settings.btnMessage.inActive;
+						results.addResult(this.question, false, this.nr);
+						this.correct[this.nr - 1] = false;
+						this.isWrongAnswer = true;
+						this.btnMessage = settings.btnMessage.inActive;
 					}
-					$scope.nr++;
+					this.nr++;
 				}
 			};
-			$scope.nextQuestion = function(){
-				if ($scope.nr < settings.nrOfQuestions){
-					$scope.isWrongAnswer = false;
-					$scope.btnMessage = settings.btnMessage.active;
-					$scope.question.useranswer = "";
-					$scope.setFocus = true;
-					$scope.question = questions.getQuestion($scope.type);
+			this.nextQuestion = function(){
+				if (this.nr < settings.nrOfQuestions){
+					this.isWrongAnswer = false;
+					this.btnMessage = settings.btnMessage.active;
+					this.question.useranswer = "";
+					this.setFocus = true;
+					this.question = questions.getQuestion(this.type);
 				} else {
 					console.log("get results");
 					var res = results.getResults();
-					$scope.subview = "results";
+					this.subview = "results";
 					console.log(res);
 				}
 			};
@@ -171,6 +170,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 .directive('autoFocus', function() {
     return {
         restrict: 'AC',
+        scope: {setFocus:'=setfocus'},
         link: function(scope, element, attr) {
         	scope.$watch('setFocus', function() {
 				element[0].focus();
@@ -184,6 +184,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
     return {
         restrict: 'E',
         replace: true,
+        scope: {correct:'='},
         templateUrl: 'directives/progress.htm'
     };
 });

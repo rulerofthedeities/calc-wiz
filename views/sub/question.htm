@@ -1,0 +1,18 @@
+<div class="subHeader">
+	<div class="pull-left">Question {{ctrl.nr}}/{{ctrl.maxNr}}</div>
+	<div class="pull-right"><exercise-progress correct="ctrl.correct"></exercise-progress></div>
+</div>
+<div id="exercise">
+	<div id="question">
+		<div class="term">{{ctrl.question.terms[1]}}</div>
+		<div class="term term2"><span id="operator">{{ctrl.question.operator}}</span>{{ctrl.question.terms[2]}}</div>
+		<form name="answerForm" ng-submit="ctrl.submitAnswer(answer)" novalidate>
+			<label class="sr-only" for="answer">Answer</label>
+			<input name="answer" ng-model="ctrl.question.useranswer" setfocus="ctrl.setFocus" auto-focus autocomplete="off" ng-keyup="ctrl.setCursor($event)" ng-class="{'red':ctrl.isWrongAnswer}" ng-disabled="ctrl.isWrongAnswer">
+			<i id="clear" class="fa fa-times pull-right" ng-hide="ctrl.isWrongAnswer" ng-click="ctrl.clearField('useranswer')"></i>
+			<div ng-hide="!ctrl.isWrongAnswer" class="msg text-danger">The correct answer is: {{ctrl.question.answer}}</div>
+			<button type="submit" class="btn btn-success btn-lg">{{ctrl.btnMessage}}</button> 
+		</form>
+	</div>
+</div> 
+</div>
