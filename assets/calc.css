@@ -89,3 +89,7 @@ input[name=answer].red{
 	position: relative;
 	top:-10px;
 }
+.exercise > .nr{
+	font-size: 16px;
+	float:left;
+}

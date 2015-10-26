@@ -2,7 +2,10 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 
 .value("settings", {
 	nrOfQuestions: 5,
-	range:{addition: {min: 101, max: 9999}},
+	range:{
+		addition: {min: 101, max: 9999},
+		subtraction: {min: 101, max: 9999}
+	},
 	operator:{
 		addition: {label:'+', operator:'+'},
 		subtraction: {label:'-', operator:'-'},
@@ -14,9 +17,9 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 
 .config(function($routeProvider){
 	$routeProvider.when('/', {
-		templateUrl: 'views/menu.htm'
-	}).when('/addition', {
-		templateUrl: 'views/addition.htm'
+		templateUrl: 'views/menu.htm' 
+	}).when('/exercises/:type', {
+		templateUrl: 'views/exercises.htm'
 	}).otherwise({redirectTo: '/'});
 })
 
@@ -28,6 +31,9 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		pad: function(str, padding, len){
 			str = Array(len + 1).join(padding) + str;
 			return (str.slice(-len));
+		},
+		capitalizeFirstLetter: function(str){
+			return str.charAt(0).toUpperCase() + str.slice(1);
 		}
 	};
 })
@@ -100,9 +106,20 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		restrict: 'E',
 		replace: true,
 		templateUrl: 'directives/header.htm',
-		scope: {title:'@'},
+		scope: {title: '@'},
 		controller: function($scope){
 			$scope.isHeaderCollapsed = true;
+		}
+	};
+})
+
+.directive("calcExerciseWrapper", function($routeParams, utils){
+	return{
+		restrict: 'E',
+		replace: true,
+		controller: function($scope){
+			$scope.type = $routeParams.type;
+			$scope.title = utils.capitalizeFirstLetter($routeParams.type);
 		}
 	};
 })
