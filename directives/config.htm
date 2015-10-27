@@ -1,0 +1,48 @@
+<form id="config" name="configForm" ng-submit="config.updateConfig(config)">
+	<div class="panel panel-primary">
+	    <div class="panel-heading">Addition</div>
+		<div class="panel-body">
+			<div class="right">
+				Term 1:
+				min: <input type="number" name="additionMin1" ng-model="config.range.addition.t1.min" min="0" maxlength="6" autocomplete="off" ng-change="config.changed()">
+				max: <input type="number" name="additionMax1" ng-model="config.range.addition.t1.max" min="{{config.range.addition.t1.min + 1}}" maxlength="6" autocomplete="off" ng-change="config.changed()">
+			</div>
+			<div class="right">
+				Term 2:
+				min: <input type="number" name="additionMin2" ng-model="config.range.addition.t2.min" min="0" max="{{config.range.addition.t2.max -1}}" maxlength="6" autocomplete="off" ng-change="config.changed()">
+				max: <input type="number" name="additionMax2" ng-model="config.range.addition.t2.max" min="{{config.range.addition.t2.min + 1}}" maxlength="6" autocomplete="off" ng-change="config.changed()">
+			</div>
+			<div class="right underscore"><span>+</span> ____________________</div>
+			<div class="right">
+				Total:
+				min: <input type="number" name="additionResultMin" ng-model="config.range.addition.result.min" min="0" maxlength="6" autocomplete="off">
+				max: <input type="number" min="{{config.range.addition.t1.min + config.range.addition.t2.min + 1}}" name="additionResultMax" ng-model="config.range.addition.result.max" maxlength="6" autocomplete="off" ng-change="config.changed()">
+			</div>
+		</div>
+	</div>
+	<div class="panel panel-primary">
+	    <div class="panel-heading">Subtraction</div>
+		<div class="panel-body">
+			<div class="right">
+				Term 1:
+				min: <input type="number" name="subtractionMin1" ng-model="config.range.subtraction.t1.min" min="{{config.range.subtraction.t2.min + 1}}" maxlength="6" autocomplete="off" ng-change="config.changed()">
+				max: <input type="number" name="subtractionMax1" ng-model="config.range.subtraction.t1.max" min="{{config.range.subtraction.t1.min + 1}}" maxlength="6" autocomplete="off" ng-change="config.changed()">
+			</div>
+			<div class="right">
+				Term 2:
+				min: <input type="number" name="subtractionMin2" ng-model="config.range.subtraction.t2.min" min="0" max="{{config.range.subtraction.t1.max - 1}}" maxlength="6" autocomplete="off" ng-change="config.changed()">
+				max: <input type="number" name="subtractionMax2" ng-model="config.range.subtraction.t2.max" min="{{config.range.subtraction.t2.min + 1}}" maxlength="6" autocomplete="off" ng-change="config.changed()">
+			</div>
+			<div class="right underscore"><span>-</span> ____________________</div>
+			<div class="right">
+				Total:
+				min: <input type="number" name="subtractionResultMin" ng-model="config.range.subtraction.result.min" min="0" maxlength="6" autocomplete="off" ng-change="config.changed()">
+				max: <input type="number" name="subtractionResultMax" ng-model="config.range.subtraction.result.max" min="{{config.range.subtraction.result.min + 1}}" maxlength="6" autocomplete="off" ng-change="config.changed()">
+			</div>
+		</div>
+	</div>
+	<button style="submit" class="btn btn-success">Submit changes</button>
+	<div>{{config.msg}}</div>
+</form>
+
+

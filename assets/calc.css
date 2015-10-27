@@ -23,6 +23,18 @@ span.icon {
     margin-bottom: 0;
 }
 
+
+/********************/
+/* show mobile menu */
+/********************/
+
+@media (min-width: 768px)
+{
+    .navbar-header {float: none;}
+    .navbar-toggle {display: block;}
+	.navbar-collapse.collapse {display: none !important;}
+}
+
 /************/
 /* question */
 /************/
@@ -80,6 +92,7 @@ input[name=answer].red{
 	text-align:right;
 	font-size: 36px;
 	padding:40px;
+	min-height: 270px;
 }
 .exercise > .nok{
 	text-decoration: line-through;
@@ -92,4 +105,33 @@ input[name=answer].red{
 .exercise > .nr{
 	font-size: 16px;
 	float:left;
+}
+
+/************/
+/* config   */
+/************/
+
+#config .panel-body{
+	width:300px;
+	margin:0 auto;
+}
+#config .panel-body > .right{
+	text-align: right;
+}
+#config .panel-body > .underscore{
+	position:relative;
+	top:-10px;
+}
+#config .panel-body > .underscore > span{
+	position:relative;
+	top:6px;
+}
+
+#config input{
+	width:60px;
+}
+
+#config .ng-invalid {
+  background: red;
+  color:white;
 }

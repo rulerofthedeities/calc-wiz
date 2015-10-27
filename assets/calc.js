@@ -3,8 +3,18 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 .value("settings", {
 	nrOfQuestions: 5,
 	range:{
-		addition: {min: 101, max: 9999},
-		subtraction: {min: 101, max: 9999}
+		addition: {
+			t1: {min: 101, max: 9999},
+			t2: {min: 101, max: 9999},
+			result: {min: 200, max: 9999}
+		},
+		subtraction: {
+			t1: {min: 102, max: 9999},
+			t2: {min: 101, max: 9999},
+			result: {min: 1, max: 9000}
+		},
+		multiplication: {min: 101, max: 999},
+		division: {min: 11, max: 99}
 	},
 	operator:{
 		addition: {label:'+', operator:'+'},
@@ -20,6 +30,8 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		templateUrl: 'views/menu.htm' 
 	}).when('/exercises/:type', {
 		templateUrl: 'views/exercises.htm'
+	}).when('/config', {
+		templateUrl: 'views/configuration.htm'
 	}).otherwise({redirectTo: '/'});
 })
 
@@ -38,24 +50,65 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 	};
 })
 
-.factory("questions", function(settings, utils){
-	return {
-		getQuestion: function(tpe){
-			var range = settings.range[tpe],
-			term1 = utils.getRandomInt(range.min, range.max),
-			term2 = utils.getRandomInt(range.min, range.max),
-			len = Math.max(term1.toString().length, term2.toString().length);
+.service("questions", function(settings, utils){
+	this._getTerms = function(tpe){
+		var range = settings.range[tpe],
+			term1 = utils.getRandomInt(range.t1.min, range.t1.max),
+			term2 = utils.getRandomInt(range.t2.min, range.t2.max),
+			cnt = 0;
 
-			return {
-				terms: {
-					1: utils.pad(term1, " ", len), 
-					2: utils.pad(term2, " ", len)
-				},
-				operator: settings.operator[tpe].label,
-				len: len,
-				answer: eval(term1 + settings.operator[tpe].operator + term2)
-			};
+		switch (tpe){
+			case "addition":
+				cnt = 0;  
+				while (term1 + term2 < range.result.min || term1 + term2 > range.result.max){
+					term1 = utils.getRandomInt(range.t1.min + cnt, range.t1.max - cnt);
+					term2 = utils.getRandomInt(range.t2.min + cnt, range.t2.max - cnt);
+					cnt++;
+				}
+				break;
+			case "subtraction": 
+				cnt = 0;
+				while (term1 - term2 < range.result.min || term1 - term2 > range.result.max){
+					term1 = utils.getRandomInt(range.t1.min + cnt, range.t1.max);
+					term2 = utils.getRandomInt(range.t2.min, range.t2.max - cnt);
+					cnt++;
+				}
+				break;
+			case "multiplication": break;
+			case "division": break;
 		}
+		return {term1: term1, term2:term2};
+	};
+
+	this._getHelpFields = function(tpe, len){
+		var nrOfHelpFields = 0;
+		switch (tpe){
+			case "addition": break;
+			case "subtraction": break;
+			case "multiplication": nrOfHelpFields = len - 1; break;
+			case "division": nrOfHelpFields = (len - 1 ) * 2; break;
+		}
+		return nrOfHelpFields;
+	};
+
+	this.getQuestion = function(tpe){
+		var terms = {},
+			len = 0,
+			helpFields = 0; 
+
+		terms = this._getTerms(tpe);
+		len = Math.max(terms.term1.toString().length, terms.term2.toString().length);
+		helpFields = this._getHelpFields(tpe, len);
+		return {
+			terms: {
+				1: utils.pad(terms.term1, " ", len), 
+				2: utils.pad(terms.term2, " ", len)
+			},
+			operator: settings.operator[tpe].label,
+			len: len,
+			fields: helpFields,
+			answer: eval(terms.term1 + settings.operator[tpe].operator + terms.term2)
+		};
 	};
 })
 
@@ -105,10 +158,29 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 	return{
 		restrict: 'E',
 		replace: true,
-		templateUrl: 'directives/header.htm',
 		scope: {title: '@'},
+		templateUrl: 'directives/header.htm',
 		controller: function($scope){
 			$scope.isHeaderCollapsed = true;
+		}
+	};
+})
+
+.directive("calcConfig", function(settings){
+	return{
+		restrict: 'E',
+		replace: true,
+		scope: {},
+		templateUrl: 'directives/config.htm',
+		controllerAs: 'config',
+		controller: function(){
+			this.range = settings.range;
+			this.updateConfig = function(range){
+				this.msg = "Your changes have been submitted";
+			};
+			this.changed = function(){
+				this.msg = "";
+			};
 		}
 	};
 })
@@ -156,7 +228,6 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			this.clearField = function(fieldName){
 				this.question[fieldName] = "";
 				this.setFocus = true;
-				$scope.setFocus = true;
 			};
 			this.setCursor = function($event) {
 				var element = $event.target;
