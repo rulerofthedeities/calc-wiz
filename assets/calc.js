@@ -14,7 +14,12 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			result: {min: 1, max: 9000}
 		},
 		multiplication: {min: 101, max: 999},
-		division: {min: 11, max: 99}
+		division: {
+			t1: {min: 120, max: 9999},
+			t2: {min: 11, max: 99},
+			decimals: 0,
+			truncate: true
+		}
 	},
 	operator:{
 		addition: {label:'+', operator:'+'},
@@ -74,39 +79,53 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 					cnt++;
 				}
 				break;
-			case "multiplication": break;
-			case "division": break;
+			case "multiplication": 
+				break;
+			case "division": 
+
+				break;
 		}
 		return {term1: term1, term2:term2};
 	};
 
 	this._getHelpFields = function(tpe, len){
-		var nrOfHelpFields = 0;
+		var nrOfHelpFields = 0,
+			fields = [];
 		switch (tpe){
 			case "addition": break;
 			case "subtraction": break;
 			case "multiplication": nrOfHelpFields = len - 1; break;
 			case "division": nrOfHelpFields = (len - 1 ) * 2; break;
 		}
-		return nrOfHelpFields;
+		for(var indx = 0; indx < nrOfHelpFields; indx++){
+			fields.push({nr:indx});
+		}
+		return fields;
+	};
+
+	this._getLen = function(terms, tpe){
+		var len = Math.max(terms.term1.toString().length, terms.term2.toString().length);
+		if (tpe === "division"){
+			len = settings.range.division.t1.max.toString().length;
+		}
+		return len;
 	};
 
 	this.getQuestion = function(tpe){
 		var terms = {},
-			len = 0,
-			helpFields = 0; 
+			len = 0; 
 
 		terms = this._getTerms(tpe);
-		len = Math.max(terms.term1.toString().length, terms.term2.toString().length);
-		helpFields = this._getHelpFields(tpe, len);
+		len = this._getLen(terms, tpe);
+
 		return {
 			terms: {
 				1: utils.pad(terms.term1, " ", len), 
-				2: utils.pad(terms.term2, " ", len)
+				2: tpe !== "division" ? utils.pad(terms.term2, " ", len) : terms.term2
 			},
 			operator: settings.operator[tpe].label,
 			len: len,
-			fields: helpFields,
+			fields: this._getHelpFields(tpe, len),
 			answer: eval(terms.term1 + settings.operator[tpe].operator + terms.term2)
 		};
 	};
@@ -175,7 +194,8 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		controllerAs: 'config',
 		controller: function(){
 			this.range = settings.range;
-			this.updateConfig = function(range){
+			this.nrOfQuestions = settings.nrOfQuestions;
+			this.updateConfig = function(){
 				this.msg = "Your changes have been submitted";
 			};
 			this.changed = function(){
@@ -220,11 +240,13 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			results.init();
 			this.nr = 1;
 			this.subview = "question";
+			this.subviewType = this.type === "addition" || this.type === "subtraction" ? "addsub" : this.type
 			this.maxNr = settings.nrOfQuestions;
 			this.correct = [];
 			this.isWrongAnswer = false;
 			this.btnMessage = settings.btnMessage.active;
 			this.question = questions.getQuestion(this.type);
+			console.log(this.question);
 			this.clearField = function(fieldName){
 				this.question[fieldName] = "";
 				this.setFocus = true;
@@ -299,4 +321,3 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
         templateUrl: 'directives/result.htm'
     };
 });
-

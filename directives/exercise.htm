@@ -1,10 +1,18 @@
 <div id="{{type}}">
 	<div ng-switch="ctrl.subview" panel-view> 
 		<div ng-switch-when="question">
-			<div ng-include="'views/sub/question.htm'"></div> 
+			<div class="subHeader">
+				<div class="pull-left">Question {{ctrl.nr}}/{{ctrl.maxNr}}</div>
+				<div class="pull-right">
+					<exercise-progress correct="ctrl.correct"></exercise-progress>
+				</div>
+			</div>
+			<div id="exercise" ng-class="ctrl.subviewType">
+				<div ng-include="'views/sub/' + ctrl.subviewType +'question.htm'"></div> 
+			</div>
 		</div>
 		<div ng-switch-when="results">
 			<exercise-results results="ctrl.results"></exercise-results>
 		</div>
 	</div>
-</div>
+</div> 

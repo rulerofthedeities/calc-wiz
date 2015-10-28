@@ -46,6 +46,10 @@ span.icon {
 	display:block;
 	margin-top:30px;
 }
+#exercise.division{
+	width:400px;
+	border:1px solid red;
+}
 .subHeader{
 	border:1px solid grey;
 }
@@ -56,6 +60,15 @@ span.icon {
 	font-size:64px;
 	line-height: 70px;
 	text-align: right;
+}
+.division #question{
+	text-align: left;
+}
+pre{
+	background-color:white;
+	border:0;
+	font-size:inherit;
+	line-height: inherit;
 }
 .term2{
 	text-decoration: underline;
@@ -71,8 +84,24 @@ input[name=answer]{
 	outline: 0;
 	color:blue;
 }
+.division input[name=answer]{
+	direction: ltr;
+}
 input[name=answer].red{
 	color:red;
+}
+.helpers{
+	width:170px;
+	border-right:5px solid #000;
+	margin-right:4px;
+	position: relative;
+	top:-20px;
+	line-height: 50px;
+}
+input.helper{
+	width:130px;
+	border:1px dotted #ccc;
+	margin-left:6px;
 }
 #clear{
 	position:relative;

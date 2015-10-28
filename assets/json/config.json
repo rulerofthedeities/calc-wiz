@@ -1,0 +1,27 @@
+{
+	"nrOfQuestions": 5,
+	"range":{
+		"addition": {
+			"t1": {"min": 101, "max": 9999},
+			"t2": {"min": 101, "max": 9999},
+			"result": {"min": 200, "max": 9999}
+		},
+		"subtraction": {
+			"t1": {"min": 102, "max": 9999},
+			"t2": {"min": 101, "max": 9999},
+			"result": {"min": 1, "max": 9000}
+		},
+		"multiplication": {"min": 101, "max": 999},
+		"division": {"min": 11, "max": 99}
+	},
+	"operator":{
+		"addition": {"label":"+", "operator":"+"},
+		"subtraction": {"label":"-", "operator":"-"},
+		"division": {"label": "&#xf7;", "operator":"/"},
+		"multiplication": {"label":"x", "operator":"*"}
+	},
+	"btnMessage": {
+		"active": "Submit Answer", 
+		"inActive": "Next Question"
+	}
+}
