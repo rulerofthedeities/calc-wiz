@@ -1,11 +1,11 @@
 <div id="question">
 	<div class="terms">
-		<pre><span class="term term2">{{ctrl.question.terms[1]}}|{{ctrl.question.terms[2]}}</span></pre>
+		<pre><span class="term">{{ctrl.question.terms[1]}}</span><span class="term term2">|{{ctrl.question.terms[2]}}</span></pre>
 		
 	</div>
 	<form name="answerForm" ng-submit="ctrl.submitAnswer(answer)" novalidate>
 		<div class="helpers pull-left">
-			<input type="text" class="helper" ng-repeat="field in ctrl.question.fields">
+			<input type="text" class="helper" ng-repeat="field in ctrl.question.fields" ng-class="[field.offset, field.width]">
 		</div>
 		<label class="sr-only" for="answer">Answer</label>
 		<input 

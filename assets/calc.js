@@ -17,8 +17,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		division: {
 			t1: {min: 120, max: 9999},
 			t2: {min: 11, max: 99},
-			decimals: 0,
-			truncate: true
+			decimals: 1
 		}
 	},
 	operator:{
@@ -34,7 +33,8 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 	$routeProvider.when('/', {
 		templateUrl: 'views/menu.htm' 
 	}).when('/exercises/:type', {
-		templateUrl: 'views/exercises.htm'
+		templateUrl: 'views/exercises.htm',
+		controller:'exercisesCtrl'
 	}).when('/config', {
 		templateUrl: 'views/configuration.htm'
 	}).otherwise({redirectTo: '/'});
@@ -82,23 +82,35 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			case "multiplication": 
 				break;
 			case "division": 
-
+				if (settings.range.division.decimals === 0){
+					term1 = term2 * utils.getRandomInt(Math.floor(range.t1.min / range.t2.min), Math.floor(range.t1.max /range.t2.max))
+				} else {
+					while (parseInt(term1.toString().slice(0, term2.toString().length), 10) < term2){
+						term1 = utils.getRandomInt(range.t1.min, range.t1.max);
+						term2 = utils.getRandomInt(range.t2.min, range.t2.max);
+					}
+				}
 				break;
 		}
 		return {term1: term1, term2:term2};
 	};
 
-	this._getHelpFields = function(tpe, len){
+	this._getHelpFields = function(tpe, terms){
 		var nrOfHelpFields = 0,
 			fields = [];
 		switch (tpe){
 			case "addition": break;
 			case "subtraction": break;
-			case "multiplication": nrOfHelpFields = len - 1; break;
-			case "division": nrOfHelpFields = (len - 1 ) * 2; break;
-		}
-		for(var indx = 0; indx < nrOfHelpFields; indx++){
-			fields.push({nr:indx});
+			case "multiplication": nrOfHelpFields = this._getLen(terms, tpe) - 1; break;
+			case "division": 
+				nrOfHelpFields = (terms.term1.toString().length - 1 ) * 2; 
+				var t2Len = terms.term2.toString().length;
+				var t1Offset = settings.range.division.t1.max.toString().length - terms.term1.toString().length;
+				for(var indx = 0; indx < nrOfHelpFields; indx++){
+					fields.push({width:'width' + (t2Len + (indx === 0 ? 0 : 1)),
+								offset:'offset' + (t1Offset + Math.floor(Math.abs((indx - 1) / 2)))});
+				}
+				break;
 		}
 		return fields;
 	};
@@ -113,11 +125,16 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 
 	this.getQuestion = function(tpe){
 		var terms = {},
-			len = 0; 
+			len = 0,
+			answer; 
 
 		terms = this._getTerms(tpe);
 		len = this._getLen(terms, tpe);
-
+		answer = eval(terms.term1 + settings.operator[tpe].operator + terms.term2);
+		if (tpe === "division"){
+			var div = Math.pow(10, settings.range.division.decimals);
+			answer = Math.floor(answer * div) / div;
+		}
 		return {
 			terms: {
 				1: utils.pad(terms.term1, " ", len), 
@@ -125,8 +142,8 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			},
 			operator: settings.operator[tpe].label,
 			len: len,
-			fields: this._getHelpFields(tpe, len),
-			answer: eval(terms.term1 + settings.operator[tpe].operator + terms.term2)
+			fields: this._getHelpFields(tpe, terms),
+			answer: answer
 		};
 	};
 })
@@ -160,6 +177,11 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		this._processResults();
 		return this.results;
 	};
+})
+
+.controller("exercisesCtrl", function($scope, $routeParams, utils){
+	$scope.type = $routeParams.type;
+	$scope.title = utils.capitalizeFirstLetter($routeParams.type);
 })
 
 .directive("calcMenu", function(){
@@ -204,18 +226,6 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		}
 	};
 })
-
-.directive("calcExerciseWrapper", function($routeParams, utils){
-	return{
-		restrict: 'E',
-		replace: true,
-		controller: function($scope){
-			$scope.type = $routeParams.type;
-			$scope.title = utils.capitalizeFirstLetter($routeParams.type);
-		}
-	};
-})
-
 .directive("panelView", function(){
 	return{
 		restrict: 'A',
@@ -246,7 +256,6 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			this.isWrongAnswer = false;
 			this.btnMessage = settings.btnMessage.active;
 			this.question = questions.getQuestion(this.type);
-			console.log(this.question);
 			this.clearField = function(fieldName){
 				this.question[fieldName] = "";
 				this.setFocus = true;

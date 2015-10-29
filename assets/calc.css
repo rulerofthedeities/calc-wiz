@@ -48,7 +48,6 @@ span.icon {
 }
 #exercise.division{
 	width:400px;
-	border:1px solid red;
 }
 .subHeader{
 	border:1px solid grey;
@@ -67,6 +66,7 @@ span.icon {
 pre{
 	background-color:white;
 	border:0;
+	font-family: inherit;
 	font-size:inherit;
 	line-height: inherit;
 }
@@ -76,6 +76,10 @@ pre{
 .msg{
 	font-size:16px;
 	line-height:18px;
+}
+.division form{
+	position: relative;
+	top:-26px;
 }
 input[name=answer]{
 	width:200px;
@@ -91,18 +95,26 @@ input[name=answer].red{
 	color:red;
 }
 .helpers{
-	width:170px;
+	width:186px;
 	border-right:5px solid #000;
 	margin-right:4px;
 	position: relative;
-	top:-20px;
+	font-size:64px;
 	line-height: 50px;
+	overflow: hidden;
 }
 input.helper{
-	width:130px;
+	width:160px;
 	border:1px dotted #ccc;
-	margin-left:6px;
+	margin-left:10px;
+	display: block;
 }
+input.offset1{margin-left:46px;}
+input.offset2{margin-left:82px;}
+input.offset3{margin-left:118px;}
+input.width1{width:52px;}
+input.width2{width:88px;}
+input.width3{width:124px;}
 #clear{
 	position:relative;
 	font-size:64px;
@@ -155,11 +167,9 @@ input.helper{
 	position:relative;
 	top:6px;
 }
-
 #config input{
 	width:60px;
 }
-
 #config .ng-invalid {
   background: red;
   color:white;
