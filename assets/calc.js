@@ -23,7 +23,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 	operator:{
 		addition: {label:'+', operator:'+'},
 		subtraction: {label:'-', operator:'-'},
-		division: {label: '&#xf7;', operator: '/'},
+		division: {label: '\u00F7', operator: '/'},//'&divide;'
 		multiplication: {label:'x', operator:'*'}
 	},
 	btnMessage: {active: "Submit Answer", inActive: "Next Question"}
@@ -83,7 +83,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 				break;
 			case "division": 
 				if (settings.range.division.decimals === 0){
-					term1 = term2 * utils.getRandomInt(Math.floor(range.t1.min / range.t2.min), Math.floor(range.t1.max /range.t2.max))
+					term1 = term2 * utils.getRandomInt(Math.floor(range.t1.min / range.t2.min), Math.floor(range.t1.max /range.t2.max));
 				} else {
 					while (parseInt(term1.toString().slice(0, term2.toString().length), 10) < term2){
 						term1 = utils.getRandomInt(range.t1.min, range.t1.max);
@@ -250,7 +250,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			results.init();
 			this.nr = 1;
 			this.subview = "question";
-			this.subviewType = this.type === "addition" || this.type === "subtraction" ? "addsub" : this.type
+			this.subviewType = this.type === "addition" || this.type === "subtraction" ? "addsub" : this.type;
 			this.maxNr = settings.nrOfQuestions;
 			this.correct = [];
 			this.isWrongAnswer = false;

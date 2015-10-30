@@ -159,6 +159,9 @@ input.width3{width:124px;}
 #config .panel-body > .right{
 	text-align: right;
 }
+#config .panel-body > .center{
+	text-align:center;
+}
 #config .panel-body > .underscore{
 	position:relative;
 	top:-10px;

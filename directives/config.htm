@@ -2,16 +2,18 @@
 	<div class="panel panel-primary">
 		<div class="panel-heading">General</div>
 		<div class="panel-body">
-		Questions:
-			<input 
-				type="number" 
-				name="nrOfQuestions" 
-				ng-model="config.nrOfQuestions" 
-				min="1"
-				min="100"
-				maxlength="3" 
-				autocomplete="off" 
-				ng-change="config.changed()">
+			<div class="center">
+				Questions:
+				<input 
+					type="number" 
+					name="nrOfQuestions" 
+					ng-model="config.nrOfQuestions" 
+					min="1"
+					min="100"
+					maxlength="3" 
+					autocomplete="off" 
+					ng-change="config.changed()">
+			</div>
 		</div>
 	</div>
 
@@ -137,6 +139,63 @@
 						ng-model="config.range.subtraction.result.max" 
 						min="{{config.range.subtraction.result.min + 1}}" 
 						maxlength="6" 
+						autocomplete="off" 
+						ng-change="config.changed()">
+			</div>
+		</div>
+	</div>
+	<div class="panel panel-primary">
+	    <div class="panel-heading">Division</div>
+		<div class="panel-body">
+			<div class="right">
+				Term 1:
+				min: <input 
+						type="number" 
+						name="divisionMin1" 
+						ng-model="config.range.division.t1.min" 
+						min="11" 
+						maxlength="6" 
+						autocomplete="off" 
+						ng-change="config.changed()">
+				max: <input 
+						type="number" 
+						name="divisionMax1" 
+						ng-model="config.range.division.t1.max" 
+						min="{{config.range.division.t1.min + 1}}" 
+						maxlength="6" 
+						autocomplete="off" 
+						ng-change="config.changed()">
+			</div>
+			<div class="right">
+				Term 2:
+				min: <input 
+						type="number" 
+						name="divisionMin2" 
+						ng-model="config.range.division.t2.min" 
+						min="0" 
+						max="{{config.range.division.t1.max - 1}}" 
+						maxlength="6" 
+						autocomplete="off" 
+						ng-change="config.changed()">
+				max: <input 
+						type="number" 
+						name="divisionMax2" 
+						ng-model="config.range.division.t2.max" 
+						min="{{config.range.division.t2.min + 1}}" 
+						maxlength="6" 
+						autocomplete="off" 
+						ng-change="config.changed()">
+			</div>
+			<br>
+			<div class="center">
+				decimals: 
+				<input 
+						type="number" 
+						name="divisionDecimals" 
+						ng-model="config.range.division.decimals" 
+						min="0" 
+						max="10" 
+						maxlength="1" 
 						autocomplete="off" 
 						ng-change="config.changed()">
 			</div>
