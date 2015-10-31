@@ -13,7 +13,10 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			t2: {min: 101, max: 9999},
 			result: {min: 1, max: 9000}
 		},
-		multiplication: {min: 101, max: 999},
+		multiplication: {
+			t1: {min: 101, max: 9999},
+			t2: {min: 11, max: 999}
+		},
 		division: {
 			t1: {min: 120, max: 9999},
 			t2: {min: 11, max: 99},
@@ -101,7 +104,8 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		switch (tpe){
 			case "addition": break;
 			case "subtraction": break;
-			case "multiplication": nrOfHelpFields = this._getLen(terms, tpe) - 1; break;
+			case "multiplication": 
+				nrOfHelpFields = terms.term2.toString().length; break;
 			case "division": 
 				nrOfHelpFields = (terms.term1.toString().length - 1 ) * 2; 
 				var t2Len = terms.term2.toString().length;
@@ -188,7 +192,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 	return{
 		restrict: 'E',
 		replace: true,
-		templateUrl: 'directives/menu.htm',
+		templateUrl: 'views/directives/menu.htm',
 		controller: function($scope){
 			$scope.isMenuCollapsed = true;
 		}
@@ -200,7 +204,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		restrict: 'E',
 		replace: true,
 		scope: {title: '@'},
-		templateUrl: 'directives/header.htm',
+		templateUrl: 'views/directives/header.htm',
 		controller: function($scope){
 			$scope.isHeaderCollapsed = true;
 		}
@@ -212,7 +216,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		restrict: 'E',
 		replace: true,
 		scope: {},
-		templateUrl: 'directives/config.htm',
+		templateUrl: 'views/directives/config.htm',
 		controllerAs: 'config',
 		controller: function(){
 			this.range = settings.range;
@@ -242,7 +246,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 	return {
 		restrict: 'E',
 		replace: true,
-		templateUrl: 'directives/exercise.htm',
+		templateUrl: 'views/directives/exercise.htm',
 		scope: {type:'@'},
     	bindToController: true,
     	controllerAs: 'ctrl',
@@ -318,7 +322,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
         restrict: 'E',
         replace: true,
         scope: {correct:'='},
-        templateUrl: 'directives/progress.htm'
+        templateUrl: 'views/directives/progress.htm'
     };
 })
 
@@ -327,6 +331,6 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
         restrict: 'E',
         replace: true,
         scope: {results:'='}, 
-        templateUrl: 'directives/result.htm'
+        templateUrl: 'views/directives/result.htm'
     };
 });
