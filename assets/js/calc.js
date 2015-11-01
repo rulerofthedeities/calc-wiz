@@ -260,10 +260,6 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			this.isWrongAnswer = false;
 			this.btnMessage = settings.btnMessage.active;
 			this.question = questions.getQuestion(this.type);
-			this.clearField = function(fieldName){
-				this.question[fieldName] = "";
-				this.setFocus = true;
-			};
 			this.setCursor = function($event) {
 				var element = $event.target;
 				if(element.setSelectionRange){
@@ -312,6 +308,29 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
         	scope.$watch('setFocus', function() {
 				element[0].focus();
 				scope.setFocus = false;
+			});
+        }
+    };
+})
+
+.directive('fixBackspace', function() {
+    return {
+        restrict: 'A',
+        link: function(scope, element, attr) {
+        	scope.$watch('setFocus', function() {
+				element[0].onkeydown = function() {
+					//Remove last entered digit if backspace key is pressed
+    				var key = event.keyCode || event.charCode,
+    					no = this.value.toString(),
+    					newno = "";
+    				for (var i = no.length - 1; i > 0; i--){
+    					newno = no[i] + newno;
+    				}
+    				newno += ' ';
+    				if (key === 8){
+    					this.value = newno;
+    				}
+				};
 			});
         }
     };
