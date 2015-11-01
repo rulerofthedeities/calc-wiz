@@ -15,7 +15,8 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		},
 		multiplication: {
 			t1: {min: 101, max: 9999},
-			t2: {min: 11, max: 999}
+			t2: {min: 11, max: 999},
+			result: {min: 101, max: 999999}
 		},
 		division: {
 			t1: {min: 120, max: 9999},
@@ -83,6 +84,12 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 				}
 				break;
 			case "multiplication": 
+				cnt = 0;
+				while (term1 * term2 < range.result.min || term1 * term2 > range.result.max){
+					term1 = utils.getRandomInt(range.t1.min + cnt, range.t1.max - cnt);
+					term2 = utils.getRandomInt(range.t2.min + cnt, range.t2.max - cnt);
+					cnt++;
+				}
 				break;
 			case "division": 
 				if (settings.range.division.decimals === 0){
@@ -105,7 +112,15 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			case "addition": break;
 			case "subtraction": break;
 			case "multiplication": 
-				nrOfHelpFields = terms.term2.toString().length; break;
+				nrOfHelpFields = terms.term2.toString().length; 
+				var t1Len = terms.term1.toString().length;
+
+				for(var indx = 0; indx < nrOfHelpFields; indx++){
+					fields.push({width:'width' + (t1Len + 1),
+								offset:'offset' + indx});
+				}
+
+				break;
 			case "division": 
 				nrOfHelpFields = (terms.term1.toString().length - 1 ) * 2; 
 				var t2Len = terms.term2.toString().length;
@@ -147,7 +162,8 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 			operator: settings.operator[tpe].label,
 			len: len,
 			fields: this._getHelpFields(tpe, terms),
-			answer: answer
+			answer: answer,
+			ansLen: answer.toString().length
 		};
 	};
 })
@@ -317,21 +333,19 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
     return {
         restrict: 'A',
         link: function(scope, element, attr) {
-        	scope.$watch('setFocus', function() {
-				element[0].onkeydown = function() {
-					//Remove last entered digit if backspace key is pressed
-    				var key = event.keyCode || event.charCode,
-    					no = this.value.toString(),
-    					newno = "";
-    				for (var i = no.length - 1; i > 0; i--){
-    					newno = no[i] + newno;
-    				}
-    				newno += ' ';
-    				if (key === 8){
-    					this.value = newno;
-    				}
-				};
-			});
+			element[0].onkeydown = function() {
+				//Remove last entered digit if backspace key is pressed
+				var key = event.keyCode || event.charCode,
+					no = this.value.toString(),
+					newno = "";
+				for (var i = no.length - 1; i > 0; i--){
+					newno = no[i] + newno;
+				}
+				newno += ' ';
+				if (key === 8){
+					this.value = newno;
+				}
+			};
         }
     };
 })

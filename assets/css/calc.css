@@ -46,9 +46,6 @@ span.icon {
 	display:block;
 	margin-top:30px;
 }
-#exercise.division{
-	width:400px;
-}
 .subHeader{
 	border:1px solid grey;
 }
@@ -77,10 +74,6 @@ pre{
 	font-size:16px;
 	line-height:18px;
 }
-.division form{
-	position: relative;
-	top:-26px;
-}
 input[name=answer]{
 	width:200px;
 	direction: rtl;
@@ -88,13 +81,40 @@ input[name=answer]{
 	outline: 0;
 	color:blue;
 }
-.division input[name=answer]{
-	direction: ltr;
+input[name=answer].red{color:red;}
+
+.helper{
+	border:1px dotted #ccc;
 }
-input[name=answer].red{
-	color:red;
+/** MULTIPLICATION **/
+
+#exercise.multiplication{
+	width:360px;
 }
-.helpers{
+.multiplication .helper{
+	margin-bottom:4px;
+	width:200px;
+	direction: rtl;
+}
+.multiplication input[name=answer]{
+	width:340px;
+	border-top:5px solid #000;
+}
+
+.multiplication .offset1{margin-right:36px;}
+.multiplication .offset2{margin-right:72px;}
+
+/** DIVISION **/
+
+#exercise.division{
+	width:400px;
+}
+.division form{
+	position: relative;
+	top:-26px;
+}
+.division input[name=answer]{direction: ltr;}
+.division .helpers{
 	width:186px;
 	border-right:5px solid #000;
 	margin-right:4px;
@@ -103,18 +123,18 @@ input[name=answer].red{
 	line-height: 50px;
 	overflow: hidden;
 }
-input.helper{
+.division .helper{
 	width:160px;
-	border:1px dotted #ccc;
 	margin-left:10px;
 	display: block;
 }
-input.offset1{margin-left:46px;}
-input.offset2{margin-left:82px;}
-input.offset3{margin-left:118px;}
-input.width1{width:52px;}
-input.width2{width:88px;}
-input.width3{width:124px;}
+.division .offset1{margin-left:46px;}
+.division .offset2{margin-left:82px;}
+.division .offset3{margin-left:118px;}
+.division .width1{width:52px;}
+.division .width2{width:88px;}
+.division .width3{width:124px;}
+
 #clear{
 	position:relative;
 	font-size:64px;

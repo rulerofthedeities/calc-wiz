@@ -2,22 +2,28 @@
 	<div class="term">{{ctrl.question.terms[1]}}</div>
 	<div class="term term2"><span id="operator">{{ctrl.question.operator}}</span>{{ctrl.question.terms[2]}}</div>
 	<form name="answerForm" ng-submit="ctrl.submitAnswer(answer)" novalidate>
+		<div class="helpers pull-right">
+			<input 
+				type="text" 
+				class="helper" 
+				ng-repeat="field in ctrl.question.fields" 
+				ng-keyup="ctrl.setCursor($event)" 
+				autocomplete="off" 
+				ng-class="[field.offset, field.width]">
+		</div>
 		<label class="sr-only" for="answer">Answer</label>
 		<input 
 			name="answer" 
 			ng-model="ctrl.question.useranswer" 
 			setfocus="ctrl.setFocus" 
 			auto-focus 
+			fix-backspace
+			pull-right
 			autocomplete="off" 
 			ng-keyup="ctrl.setCursor($event)" 
 			ng-class="{'red':ctrl.isWrongAnswer}" 
-			ng-disabled="ctrl.isWrongAnswer">
-		<i 
-			id="clear" 
-			class="fa fa-times pull-right" 
-			ng-hide="ctrl.isWrongAnswer" 
-			ng-click="ctrl.clearField('useranswer')">
-		</i>
+			ng-disabled="ctrl.isWrongAnswer"
+			ng-style="{width:(ctrl.question.ansLen * 46) + 'px'}">
 		<div ng-hide="!ctrl.isWrongAnswer" class="msg text-danger">The correct answer is: {{ctrl.question.answer}}</div>
 		<button type="submit" class="btn btn-success btn-lg">{{ctrl.btnMessage}}</button> 
 	</form>
