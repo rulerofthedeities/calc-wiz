@@ -1,7 +1,7 @@
 <div id="question">
 	<div class="term">{{ctrl.question.terms[1]}}</div>
 	<div class="term term2"><span id="operator">{{ctrl.question.operator}}</span>{{ctrl.question.terms[2]}}</div>
-	<form name="answerForm" ng-submit="ctrl.submitAnswer(answer)" novalidate>
+	<form name="answerForm" ng-submit="answerForm.$valid && ctrl.submitAnswer(answer)" novalidate>
 		<div class="helpers pull-right">
 			<input 
 				type="text" 
@@ -24,8 +24,9 @@
 			ng-keyup="ctrl.setCursor($event)" 
 			ng-class="{'red':ctrl.isWrongAnswer}" 
 			ng-disabled="ctrl.isWrongAnswer"
-			ng-style="{width:(ctrl.question.ansLen * 46) + 'px'}">
+			ng-style="{width:(ctrl.question.ansLen * 46) + 'px'}"
+			required>
 		<div ng-hide="!ctrl.isWrongAnswer" class="msg text-danger">The correct answer is: {{ctrl.question.answer}}</div>
-		<button type="submit" class="btn btn-success btn-lg">{{ctrl.btnMessage}}</button> 
+		<button type="submit" class="btn btn-success btn-lg" ng-disabled="answerForm.$invalid">{{ctrl.btnMessage}}</button> 
 	</form>
 </div>

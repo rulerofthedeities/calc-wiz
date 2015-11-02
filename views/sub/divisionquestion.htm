@@ -3,7 +3,7 @@
 		<pre><span class="term">{{ctrl.question.terms[1]}}</span><span class="term term2">|{{ctrl.question.terms[2]}}</span></pre>
 		
 	</div>
-	<form name="answerForm" ng-submit="ctrl.submitAnswer(answer)" novalidate>
+	<form name="answerForm" ng-submit="answerForm.$valid && ctrl.submitAnswer(answer)" novalidate>
 		<div class="helpers pull-left">
 			<input type="text" class="helper" ng-repeat="field in ctrl.question.fields" ng-class="[field.offset, field.width]">
 		</div>
@@ -16,9 +16,10 @@
 			autocomplete="off" 
 			ng-class="{'red':ctrl.isWrongAnswer}" 
 			ng-disabled="ctrl.isWrongAnswer"
-			class="pull-left">
+			class="pull-left"
+			required>
 		<div class="clearfix"></div>
 		<div ng-hide="!ctrl.isWrongAnswer" class="msg text-danger">The correct answer is: {{ctrl.question.answer}}</div>
-		<button type="submit" class="btn btn-success btn-lg">{{ctrl.btnMessage}}</button> 
+		<button type="submit" class="btn btn-success btn-lg" ng-disabled="answerForm.$invalid">{{ctrl.btnMessage}}</button> 
 	</form>
 </div>
