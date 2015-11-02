@@ -80,6 +80,7 @@
 			</div>
 		</div>
 	</div>
+
 	<div class="panel panel-primary">
 	    <div class="panel-heading">Subtraction</div>
 		<div class="panel-body">
@@ -144,6 +145,70 @@
 			</div>
 		</div>
 	</div>
+
+	<div class="panel panel-primary">
+	    <div class="panel-heading">Multiplication</div>
+		<div class="panel-body">
+			<div class="right">
+				Term 1:
+				min: <input 
+						type="number" 
+						name="multiplicationMin1" 
+						ng-model="config.range.multiplication.t1.min" 
+						min="0" 
+						maxlength="6" 
+						autocomplete="off" 
+						ng-change="config.changed()">
+				max: <input 
+						type="number" 
+						name="multiplicationMax1" 
+						ng-model="config.range.multiplication.t1.max" 
+						min="{{config.range.multiplication.t1.min + 1}}" 
+						maxlength="6" 
+						autocomplete="off" 
+						ng-change="config.changed()">
+			</div>
+			<div class="right">
+				Term 2:
+				min: <input 
+						type="number" 
+						name="multiplicationMin2" 
+						ng-model="config.range.multiplication.t2.min" 
+						min="0" 
+						maxlength="6" 
+						autocomplete="off" 
+						ng-change="config.changed()">
+				max: <input 
+						type="number" 
+						name="multiplicationMax2" 
+						ng-model="config.range.multiplication.t2.max" 
+						min="{{config.range.multiplication.t2.min + 1}}" 
+						maxlength="6" 
+						autocomplete="off" 
+						ng-change="config.changed()">
+			</div>
+			<div class="right underscore"><span>x</span> ____________________</div>
+			<div class="right">
+				Total:
+				min: <input 
+						type="number" 
+						name="multiplicationResultMin" 
+						ng-model="config.range.multiplication.result.min" 
+						min="0" 
+						maxlength="6" 
+						autocomplete="off">
+				max: <input 
+						type="number" 
+						min="{{config.range.multiplication.t1.min * config.range.multiplication.t2.min + 1}}" 
+						name="multiplicationResultMax" 
+						ng-model="config.range.multiplication.result.max" 
+						maxlength="6" 
+						autocomplete="off" 
+						ng-change="config.changed()">
+			</div>
+		</div>
+	</div>
+
 	<div class="panel panel-primary">
 	    <div class="panel-heading">Division</div>
 		<div class="panel-body">

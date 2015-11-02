@@ -8,6 +8,7 @@
 				class="helper" 
 				ng-repeat="field in ctrl.question.fields" 
 				ng-keyup="ctrl.setCursor($event)" 
+				fix-backspace
 				autocomplete="off" 
 				ng-class="[field.offset, field.width]">
 		</div>

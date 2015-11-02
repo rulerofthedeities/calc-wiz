@@ -246,9 +246,9 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 		}
 	};
 })
+
 .directive("panelView", function(){
 	return{
-		restrict: 'A',
 		controller: function($scope){ 
 			$scope.subview = "question";
 			$scope.changeView = function(newView){
@@ -330,9 +330,7 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 })
 
 .directive('fixBackspace', function() {
-    return {
-        restrict: 'A',
-        link: function(scope, element, attr) {
+    return  function(scope, element, attr) {
 			element[0].onkeydown = function() {
 				//Remove last entered digit if backspace key is pressed
 				var key = event.keyCode || event.charCode,
@@ -346,7 +344,6 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 					this.value = newno;
 				}
 			};
-        }
     };
 })
 
@@ -367,3 +364,4 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
         templateUrl: 'views/directives/result.htm'
     };
 });
+

@@ -193,6 +193,9 @@ input[name=answer].red{color:red;}
 #config input{
 	width:60px;
 }
+#config input[name="multiplicationResultMax"]{
+	width:80px;
+}
 #config .ng-invalid {
   background: red;
   color:white;
