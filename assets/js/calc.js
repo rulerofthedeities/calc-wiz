@@ -1,4 +1,8 @@
-angular.module("calc", ['ngRoute', 'ui.bootstrap'])
+angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'kmCalc.translate'])
+
+.constant("kmConfig",{	'version': '0.0.1',
+						'templateDir': 'views/directives/'
+})
 
 .value("settings", {
 	nrOfQuestions: 5,
@@ -204,35 +208,35 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 	$scope.title = utils.capitalizeFirstLetter($routeParams.type);
 })
 
-.directive("calcMenu", function(){
+.directive("calcMenu", function(kmConfig){
 	return{
 		restrict: 'E',
 		replace: true,
-		templateUrl: 'views/directives/menu.htm',
+		templateUrl: kmConfig.templateDir + 'menu.htm',
 		controller: function($scope){
 			$scope.isMenuCollapsed = true;
 		}
 	};
 })
 
-.directive("calcHeader", function(){
+.directive("calcHeader", function(kmConfig){
 	return{
 		restrict: 'E',
 		replace: true,
 		scope: {title: '@'},
-		templateUrl: 'views/directives/header.htm',
+		templateUrl: kmConfig.templateDir + 'header.htm',
 		controller: function($scope){
 			$scope.isHeaderCollapsed = true;
 		}
 	};
 })
 
-.directive("calcConfig", function(settings){
+.directive("calcConfig", function(settings, kmConfig){
 	return{
 		restrict: 'E',
 		replace: true,
 		scope: {},
-		templateUrl: 'views/directives/config.htm',
+		templateUrl: kmConfig.templateDir + 'config.htm',
 		controllerAs: 'config',
 		controller: function(){
 			this.range = settings.range;
@@ -258,11 +262,11 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
 	};
 })
 
-.directive("calcExercise", function(){
+.directive("calcExercise", function(kmConfig){
 	return {
 		restrict: 'E',
 		replace: true,
-		templateUrl: 'views/directives/exercise.htm',
+		templateUrl: kmConfig.templateDir + 'exercise.htm',
 		scope: {type:'@'},
     	bindToController: true,
     	controllerAs: 'ctrl',
@@ -347,21 +351,21 @@ angular.module("calc", ['ngRoute', 'ui.bootstrap'])
     };
 })
 
-.directive('exerciseProgress', function() {
+.directive('exerciseProgress', function(kmConfig) {
     return {
         restrict: 'E',
         replace: true,
         scope: {correct:'='},
-        templateUrl: 'views/directives/progress.htm'
+        templateUrl: kmConfig.templateDir + 'progress.htm'
     };
 })
 
-.directive('exerciseResults', function() {
+.directive('exerciseResults', function(kmConfig) {
     return {
         restrict: 'E',
         replace: true,
         scope: {results:'='}, 
-        templateUrl: 'views/directives/result.htm'
+        templateUrl: kmConfig.templateDir + 'result.htm'
     };
 });
 
