@@ -1,41 +1,6 @@
 angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'kmCalc.translate'])
 
-.constant("kmConfig",{	'version': '0.0.1',
-						'templateDir': 'views/directives/'
-})
-
-.value("settings", {
-	nrOfQuestions: 5,
-	range:{
-		addition: {
-			t1: {min: 101, max: 9999},
-			t2: {min: 101, max: 9999},
-			result: {min: 200, max: 9999}
-		},
-		subtraction: {
-			t1: {min: 102, max: 9999},
-			t2: {min: 101, max: 9999},
-			result: {min: 1, max: 9000}
-		},
-		multiplication: {
-			t1: {min: 101, max: 9999},
-			t2: {min: 11, max: 999},
-			result: {min: 101, max: 999999}
-		},
-		division: {
-			t1: {min: 120, max: 9999},
-			t2: {min: 11, max: 99},
-			decimals: 1
-		}
-	},
-	operator:{
-		addition: {label:'+', operator:'+'},
-		subtraction: {label:'-', operator:'-'},
-		division: {label: '\u00F7', operator: '/'},//'&divide;'
-		multiplication: {label:'x', operator:'*'}
-	},
-	btnMessage: {active: "Submit Answer", inActive: "Next Question"}
-})
+.constant("DEFAULTS",{	'templateDir': 'views/directives/'})
 
 .config(function($routeProvider){
 	$routeProvider.when('/', {
@@ -208,35 +173,35 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'kmCalc.translate'])
 	$scope.title = utils.capitalizeFirstLetter($routeParams.type);
 })
 
-.directive("calcMenu", function(kmConfig){
+.directive("calcMenu", function(DEFAULTS){
 	return{
 		restrict: 'E',
 		replace: true,
-		templateUrl: kmConfig.templateDir + 'menu.htm',
+		templateUrl: DEFAULTS.templateDir + 'menu.htm',
 		controller: function($scope){
 			$scope.isMenuCollapsed = true;
 		}
 	};
 })
 
-.directive("calcHeader", function(kmConfig){
+.directive("calcHeader", function(DEFAULTS){
 	return{
 		restrict: 'E',
 		replace: true,
 		scope: {title: '@'},
-		templateUrl: kmConfig.templateDir + 'header.htm',
+		templateUrl: DEFAULTS.templateDir + 'header.htm',
 		controller: function($scope){
 			$scope.isHeaderCollapsed = true;
 		}
 	};
 })
 
-.directive("calcConfig", function(settings, kmConfig){
+.directive("calcConfig", function(settings, DEFAULTS){
 	return{
 		restrict: 'E',
 		replace: true,
 		scope: {},
-		templateUrl: kmConfig.templateDir + 'config.htm',
+		templateUrl: DEFAULTS.templateDir + 'config.htm',
 		controllerAs: 'config',
 		controller: function(){
 			this.range = settings.range;
@@ -262,11 +227,11 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'kmCalc.translate'])
 	};
 })
 
-.directive("calcExercise", function(kmConfig){
+.directive("calcExercise", function(DEFAULTS){
 	return {
 		restrict: 'E',
 		replace: true,
-		templateUrl: kmConfig.templateDir + 'exercise.htm',
+		templateUrl: DEFAULTS.templateDir + 'exercise.htm',
 		scope: {type:'@'},
     	bindToController: true,
     	controllerAs: 'ctrl',
@@ -351,21 +316,41 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'kmCalc.translate'])
     };
 })
 
-.directive('exerciseProgress', function(kmConfig) {
+.directive('exerciseProgress', function(DEFAULTS) {
     return {
         restrict: 'E',
         replace: true,
         scope: {correct:'='},
-        templateUrl: kmConfig.templateDir + 'progress.htm'
+        templateUrl: DEFAULTS.templateDir + 'progress.htm'
     };
 })
 
-.directive('exerciseResults', function(kmConfig) {
+.directive('exerciseResults', function(DEFAULTS) {
     return {
         restrict: 'E',
         replace: true,
         scope: {results:'='}, 
-        templateUrl: kmConfig.templateDir + 'result.htm'
+        templateUrl: DEFAULTS.templateDir + 'result.htm'
     };
+});
+
+angular.element(document).ready(function () {
+	var initInjector = angular.injector(['ng']),
+		$http = initInjector.get('$http'),
+		$log = initInjector.get('$log'),
+		fileName = "assets/json/config.json",
+		promise = $http.get(fileName);
+
+	promise.then(
+		function(response){
+			$log.info("Config file '" + fileName + "' loaded");
+
+			angular.module('kmCalc').value('settings', response.data);
+			angular.bootstrap(document, ['kmCalc']);
+		},
+		function(response){
+			$log.error("Error loading config file '" + fileName + "'");
+		}
+	);
 });
 

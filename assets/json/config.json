@@ -11,13 +11,21 @@
 			"t2": {"min": 101, "max": 9999},
 			"result": {"min": 1, "max": 9000}
 		},
-		"multiplication": {"min": 101, "max": 999},
-		"division": {"min": 11, "max": 99}
+		"multiplication": {
+			"t1": {"min": 101, "max": 9999},
+			"t2": {"min": 11, "max": 999},
+			"result": {"min": 101, "max": 999999}
+		},
+		"division": {
+			"t1": {"min": 120, "max": 9999},
+			"t2": {"min": 11, "max": 99},
+			"decimals": 1
+		}
 	},
 	"operator":{
 		"addition": {"label":"+", "operator":"+"},
 		"subtraction": {"label":"-", "operator":"-"},
-		"division": {"label": "&#xf7;", "operator":"/"},
+		"division": {"label": "\u00F7", "operator":"/"},
 		"multiplication": {"label":"x", "operator":"*"}
 	},
 	"btnMessage": {
