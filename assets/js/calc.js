@@ -1,9 +1,24 @@
-angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'kmCalc.translate'])
+angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 
 .constant("DEFAULTS",{	'templateDir': 'views/directives/'})
 
 .config(function($routeProvider){
-	$routeProvider.when('/', {
+	var translationResolve = ['kmts', 
+  		function(kmts){
+			return kmts.promise; 
+	}],
+
+	customRouteProvider = angular.extend({}, $routeProvider, {
+		when: function(path, route) {
+			route.resolve = (route.resolve) ? route.resolve : {};
+			angular.extend(route.resolve, translationResolve);
+			$routeProvider.when(path, route);
+			this.$inject = ['path', 'route'];
+			return this;
+		}
+	});
+
+	customRouteProvider.when('/', {
 		templateUrl: 'views/menu.htm' 
 	}).when('/exercises/:type', {
 		templateUrl: 'views/exercises.htm',
@@ -25,6 +40,22 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'kmCalc.translate'])
 		capitalizeFirstLetter: function(str){
 			return str.charAt(0).toUpperCase() + str.slice(1);
 		}
+	};
+})
+
+.service("config", function($http, settings, configFileName){
+	this.saveConfigFile = function(){
+		 var req = {
+			 method: 'POST',
+			 url: '/updateconfig',
+			 headers: {
+			   'Content-Type': "application/json"
+			 },
+			 data: settings
+			};
+		$http(req).then(function(response) {
+			console.log("Saved config file");
+		});
 	};
 })
 
@@ -76,7 +107,8 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'kmCalc.translate'])
 
 	this._getHelpFields = function(tpe, terms){
 		var nrOfHelpFields = 0,
-			fields = [];
+			fields = [],
+			indx;
 		switch (tpe){
 			case "addition": break;
 			case "subtraction": break;
@@ -84,7 +116,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'kmCalc.translate'])
 				nrOfHelpFields = terms.term2.toString().length; 
 				var t1Len = terms.term1.toString().length;
 
-				for(var indx = 0; indx < nrOfHelpFields; indx++){
+				for(indx = 0; indx < nrOfHelpFields; indx++){
 					fields.push({width:'width' + (t1Len + 1),
 								offset:'offset' + indx});
 				}
@@ -94,7 +126,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'kmCalc.translate'])
 				nrOfHelpFields = (terms.term1.toString().length - 1 ) * 2; 
 				var t2Len = terms.term2.toString().length;
 				var t1Offset = settings.range.division.t1.max.toString().length - terms.term1.toString().length;
-				for(var indx = 0; indx < nrOfHelpFields; indx++){
+				for(indx = 0; indx < nrOfHelpFields; indx++){
 					fields.push({width:'width' + (t2Len + (indx === 0 ? 0 : 1)),
 								offset:'offset' + (t1Offset + Math.floor(Math.abs((indx - 1) / 2)))});
 				}
@@ -196,7 +228,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'kmCalc.translate'])
 	};
 })
 
-.directive("calcConfig", function(settings, DEFAULTS){
+.directive("calcConfig", function(config, settings, DEFAULTS){
 	return{
 		restrict: 'E',
 		replace: true,
@@ -207,6 +239,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'kmCalc.translate'])
 			this.range = settings.range;
 			this.nrOfQuestions = settings.nrOfQuestions;
 			this.updateConfig = function(){
+				config.saveConfigFile();
 				this.msg = "Your changes have been submitted";
 			};
 			this.changed = function(){
@@ -334,22 +367,30 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'kmCalc.translate'])
     };
 });
 
+//Load json files and bootstrap
 angular.element(document).ready(function () {
 	var initInjector = angular.injector(['ng']),
 		$http = initInjector.get('$http'),
 		$log = initInjector.get('$log'),
-		fileName = "assets/json/config.json",
-		promise = $http.get(fileName);
+		configFileName = "assets/json/config.json",
+		translateFileName = "assets/json/translate.json",
+		promise = $http.get(configFileName);
 
 	promise.then(
-		function(response){
-			$log.info("Config file '" + fileName + "' loaded");
+		function(configResponse){
+			$log.info("Configuration file '" + configFileName + "' loaded");
 
-			angular.module('kmCalc').value('settings', response.data);
-			angular.bootstrap(document, ['kmCalc']);
+			angular.module('kmCalc')
+				.value('settings', configResponse.data)
+				.value("configFileName", configFileName)
+				.config(['kmtpProvider', function(kmtpProvider){
+					kmtpProvider.configSetCurrentLanguage("nl");
+					kmtpProvider.configSetTranslationFile("assets/json/translate.json", "lan");
+				}]);
+				angular.bootstrap(document, ['kmCalc'], true);
 		},
-		function(response){
-			$log.error("Error loading config file '" + fileName + "'");
+		function(){
+			$log.error("Error loading configuration file '" + configFileName + "'");
 		}
 	);
 });
