@@ -1,9 +1,9 @@
 <form id="config" name="configForm" ng-submit="config.updateConfig()">
 	<div class="panel panel-primary">
-		<div class="panel-heading">General</div>
+		<div class="panel-heading" translate="content">General</div>
 		<div class="panel-body">
 			<div class="center">
-				Questions:
+				{{config.labels.questions}}:
 				<input 
 					type="number" 
 					name="nrOfQuestions" 
@@ -18,11 +18,11 @@
 	</div>
 
 	<div class="panel panel-primary">
-	    <div class="panel-heading">Addition</div>
+	    <div class="panel-heading" translate="content">Addition</div>
 		<div class="panel-body">
 			<div class="right">
-				Term 1:
-				min: <input 
+				{{config.labels.term}} 1:
+				{{config.labels.min}}: <input 
 						type="number" 
 						name="additionMin1" 
 						ng-model="config.range.addition.t1.min" 
@@ -30,7 +30,7 @@
 						maxlength="6" 
 						autocomplete="off" 
 						ng-change="config.changed()">
-				max: <input 
+				{{config.labels.max}}: <input 
 						type="number" 
 						name="additionMax1" 
 						ng-model="config.range.addition.t1.max" 
@@ -40,8 +40,8 @@
 						ng-change="config.changed()">
 			</div>
 			<div class="right">
-				Term 2:
-				min: <input 
+				{{config.labels.term}} 2:
+				{{config.labels.min}}: <input 
 						type="number" 
 						name="additionMin2" 
 						ng-model="config.range.addition.t2.min" 
@@ -50,7 +50,7 @@
 						maxlength="6" 
 						autocomplete="off" 
 						ng-change="config.changed()">
-				max: <input 
+				{{config.labels.max}}: <input 
 						type="number" 
 						name="additionMax2" 
 						ng-model="config.range.addition.t2.max" 
@@ -61,15 +61,15 @@
 			</div>
 			<div class="right underscore"><span>+</span> ____________________</div>
 			<div class="right">
-				Total:
-				min: <input 
+				{{config.labels.total}}:
+				{{config.labels.min}}: <input 
 						type="number" 
 						name="additionResultMin" 
 						ng-model="config.range.addition.result.min" 
 						min="0" 
 						maxlength="6" 
 						autocomplete="off">
-				max: <input 
+				{{config.labels.max}}: <input 
 						type="number" 
 						min="{{config.range.addition.t1.min + config.range.addition.t2.min + 1}}" 
 						name="additionResultMax" 
@@ -82,11 +82,11 @@
 	</div>
 
 	<div class="panel panel-primary">
-	    <div class="panel-heading">Subtraction</div>
+	    <div class="panel-heading" translate="content">Subtraction</div>
 		<div class="panel-body">
 			<div class="right">
-				Term 1:
-				min: <input 
+				{{config.labels.term}} 1:
+				{{config.labels.min}}: <input 
 						type="number" 
 						name="subtractionMin1" 
 						ng-model="config.range.subtraction.t1.min" 
@@ -94,7 +94,7 @@
 						maxlength="6" 
 						autocomplete="off" 
 						ng-change="config.changed()">
-				max: <input 
+				{{config.labels.max}}: <input 
 						type="number" 
 						name="subtractionMax1" 
 						ng-model="config.range.subtraction.t1.max" 
@@ -104,8 +104,8 @@
 						ng-change="config.changed()">
 			</div>
 			<div class="right">
-				Term 2:
-				min: <input 
+				{{config.labels.term}} 2:
+				{{config.labels.min}}: <input 
 						type="number" 
 						name="subtractionMin2" 
 						ng-model="config.range.subtraction.t2.min" 
@@ -114,7 +114,7 @@
 						maxlength="6" 
 						autocomplete="off" 
 						ng-change="config.changed()">
-				max: <input 
+				{{config.labels.max}}: <input 
 						type="number" 
 						name="subtractionMax2" 
 						ng-model="config.range.subtraction.t2.max" 
@@ -125,8 +125,8 @@
 			</div>
 			<div class="right underscore"><span>-</span> ____________________</div>
 			<div class="right">
-				Total:
-				min: <input 
+				{{config.labels.total}}:
+				{{config.labels.min}}: <input 
 						type="number" 
 						name="subtractionResultMin" 
 						ng-model="config.range.subtraction.result.min" 
@@ -134,7 +134,7 @@
 						maxlength="6" 
 						autocomplete="off" 
 						ng-change="config.changed()">
-				max: <input 
+				{{config.labels.max}}: <input 
 						type="number" 
 						name="subtractionResultMax" 
 						ng-model="config.range.subtraction.result.max" 
@@ -147,11 +147,11 @@
 	</div>
 
 	<div class="panel panel-primary">
-	    <div class="panel-heading">Multiplication</div>
+	    <div class="panel-heading" translate="content">Multiplication</div>
 		<div class="panel-body">
 			<div class="right">
-				Term 1:
-				min: <input 
+				{{config.labels.term}} 1:
+				{{config.labels.min}}: <input 
 						type="number" 
 						name="multiplicationMin1" 
 						ng-model="config.range.multiplication.t1.min" 
@@ -159,7 +159,7 @@
 						maxlength="6" 
 						autocomplete="off" 
 						ng-change="config.changed()">
-				max: <input 
+				{{config.labels.max}}: <input 
 						type="number" 
 						name="multiplicationMax1" 
 						ng-model="config.range.multiplication.t1.max" 
@@ -169,8 +169,8 @@
 						ng-change="config.changed()">
 			</div>
 			<div class="right">
-				Term 2:
-				min: <input 
+				{{config.labels.term}} 2:
+				{{config.labels.min}}: <input 
 						type="number" 
 						name="multiplicationMin2" 
 						ng-model="config.range.multiplication.t2.min" 
@@ -178,7 +178,7 @@
 						maxlength="6" 
 						autocomplete="off" 
 						ng-change="config.changed()">
-				max: <input 
+				{{config.labels.max}}: <input 
 						type="number" 
 						name="multiplicationMax2" 
 						ng-model="config.range.multiplication.t2.max" 
@@ -189,15 +189,15 @@
 			</div>
 			<div class="right underscore"><span>x</span> ____________________</div>
 			<div class="right">
-				Total:
-				min: <input 
+				{{config.labels.total}}:
+				{{config.labels.min}}: <input 
 						type="number" 
 						name="multiplicationResultMin" 
 						ng-model="config.range.multiplication.result.min" 
 						min="0" 
 						maxlength="6" 
 						autocomplete="off">
-				max: <input 
+				{{config.labels.max}}: <input 
 						type="number" 
 						min="{{config.range.multiplication.t1.min * config.range.multiplication.t2.min + 1}}" 
 						name="multiplicationResultMax" 
@@ -210,11 +210,11 @@
 	</div>
 
 	<div class="panel panel-primary">
-	    <div class="panel-heading">Division</div>
+	    <div class="panel-heading" translate="content">Division</div>
 		<div class="panel-body">
 			<div class="right">
-				Term 1:
-				min: <input 
+				{{config.labels.term}} 1:
+				{{config.labels.min}}: <input 
 						type="number" 
 						name="divisionMin1" 
 						ng-model="config.range.division.t1.min" 
@@ -222,7 +222,7 @@
 						maxlength="6" 
 						autocomplete="off" 
 						ng-change="config.changed()">
-				max: <input 
+				{{config.labels.max}}: <input 
 						type="number" 
 						name="divisionMax1" 
 						ng-model="config.range.division.t1.max" 
@@ -232,8 +232,8 @@
 						ng-change="config.changed()">
 			</div>
 			<div class="right">
-				Term 2:
-				min: <input 
+				{{config.labels.term}} 2:
+				{{config.labels.min}}: <input 
 						type="number" 
 						name="divisionMin2" 
 						ng-model="config.range.division.t2.min" 
@@ -242,7 +242,7 @@
 						maxlength="6" 
 						autocomplete="off" 
 						ng-change="config.changed()">
-				max: <input 
+				{{config.labels.max}}: <input 
 						type="number" 
 						name="divisionMax2" 
 						ng-model="config.range.division.t2.max" 
@@ -253,7 +253,7 @@
 			</div>
 			<br>
 			<div class="center">
-				decimals: 
+				{{config.labels.decimals}}: 
 				<input 
 						type="number" 
 						name="divisionDecimals" 
@@ -266,7 +266,7 @@
 			</div>
 		</div>
 	</div>
-	<button style="submit" class="btn btn-success">Submit changes</button>
+	<button style="submit" class="btn btn-success" translate="content">Submit changes</button>
 	<div>{{config.msg}}</div>
 </form>
 

@@ -228,7 +228,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 	};
 })
 
-.directive("calcConfig", function(config, settings, DEFAULTS){
+.directive("calcConfig", function(config, settings, DEFAULTS, translate){
 	return{
 		restrict: 'E',
 		replace: true,
@@ -240,10 +240,18 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 			this.nrOfQuestions = settings.nrOfQuestions;
 			this.updateConfig = function(){
 				config.saveConfigFile();
-				this.msg = "Your changes have been submitted";
+				this.msg = translate.translate("Your changes have been submitted");
 			};
 			this.changed = function(){
 				this.msg = "";
+			};
+			this.labels = {
+				"questions": translate.translate("No of questions"),
+				"total": translate.translate("Total"),
+				"term": translate.translate("Term"),
+				"min": translate.translate("min"),
+				"max": translate.translate("max"),
+				"decimals": translate.translate("Decimals")
 			};
 		}
 	};
@@ -260,7 +268,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 	};
 })
 
-.directive("calcExercise", function(DEFAULTS){
+.directive("calcExercise", function(DEFAULTS, translate){
 	return {
 		restrict: 'E',
 		replace: true,
@@ -276,7 +284,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 			this.maxNr = settings.nrOfQuestions;
 			this.correct = [];
 			this.isWrongAnswer = false;
-			this.btnMessage = settings.btnMessage.active;
+			this.btnMessage = translate.translate(settings.btnMessage.active);
 			this.question = questions.getQuestion(this.type);
 			this.setCursor = function($event) {
 				var element = $event.target;
@@ -297,14 +305,14 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 						results.addResult(this.question, false, this.nr);
 						this.correct[this.nr - 1] = false;
 						this.isWrongAnswer = true;
-						this.btnMessage = settings.btnMessage.inActive;
+						this.btnMessage = translate.translate(settings.btnMessage.inActive);
 					}
 				}
 			};
 			this.nextQuestion = function(){
 				if (this.nr < settings.nrOfQuestions){
 					this.isWrongAnswer = false;
-					this.btnMessage = settings.btnMessage.active;
+					this.btnMessage = translate.translate(settings.btnMessage.active);
 					this.question.useranswer = "";
 					this.setFocus = true;
 					this.question = questions.getQuestion(this.type);

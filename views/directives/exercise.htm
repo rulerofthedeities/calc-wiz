@@ -2,7 +2,7 @@
 	<div ng-switch="ctrl.subview" panel-view> 
 		<div ng-switch-when="question">
 			<div class="subHeader">
-				<div class="pull-left">Question {{ctrl.nr}}/{{ctrl.maxNr}}</div>
+				<div class="pull-left">{{'Question' | translate}} {{ctrl.nr}}/{{ctrl.maxNr}}</div>
 				<div class="pull-right">
 					<exercise-progress correct="ctrl.correct"></exercise-progress>
 				</div>

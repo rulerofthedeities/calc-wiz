@@ -151,7 +151,7 @@ angular.module('km.translate', [])
 
 					if (params){
 						if (params === "content"){
-							//console.log("content");
+							iElement.html(translate.translate(iElement.text()));
 						}
 						else {
 							input = JSON.parse(params.replace(/\'/g, '"'));

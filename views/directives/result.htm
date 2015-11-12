@@ -1,6 +1,6 @@
 <div id="results">
 	<div class="subHeader">
-		Result: {{results.totals.correct}}/{{results.totals.nrOfQuestions}} ({{results.totals.percentage | number:0}}%)
+		{{"Result"|translate}}: {{results.totals.correct}}/{{results.totals.nrOfQuestions}} ({{results.totals.percentage | number:0}}%)
 	</div>
 	<div ng-repeat="result in results.questions track by $index" class="exercise">
 		<div class="term">{{result.question.terms[1]}}</div>

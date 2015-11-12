@@ -1,6 +1,32 @@
 {
 	"nl": {
+		"Configuration": "Configuratie",
+		"Results": "Resultaten",
+		"Login": "Aanmelden",
+		"General": "Algemeen",
+
 		"Arithmetic": "Rekenen",
-		"Addition": "Optellen"
+		"Venn Diagrams": "Venndiagrammen",
+		"Number Knowledge": "Cijferkennis",
+		"Addition": "Optellen",
+		"Subtraction": "Aftrekken",
+		"Multiplication": "Vermenigvuldigen",
+		"Division": "Delen",
+		"Submit changes": "Sla wijzigingen op",
+		"Your changes have been submitted": "De wijzigingen zijn doorgevoerd",
+
+		"No of questions": "Aantal vragen",
+		"Total": "Totaal",
+		"Term": "Term",
+		"min": "min",
+		"max": "max",
+		"Decimals": "Decimalen",
+
+		"Question": "Vraag",
+		"Answer": "Antwoord",
+		"Submit Answer": "Voer antwoord in",
+		"Next Question": "Volgende vraag",
+		"The correct answer is:": "Het juiste antwoord is:",
+		"Result": "Resultaat"
 	}
 }
