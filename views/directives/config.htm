@@ -1,24 +1,32 @@
-<form id="config" name="configForm" ng-submit="config.updateConfig()">
+<form id="config" name="configForm" ng-submit="config.updateConfig()" class="form-horizontal">
 	<div class="panel panel-primary">
 		<div class="panel-heading" translate="content">General</div>
 		<div class="panel-body">
-			<div class="center">
-				{{config.labels.questions}}:
-				<input 
-					type="number" 
-					name="nrOfQuestions" 
-					ng-model="config.nrOfQuestions" 
-					min="1"
-					min="100"
-					maxlength="3" 
-					autocomplete="off" 
-					ng-change="config.changed()">
+			<div class="form-group">
+				<label for="language" class="control-label col-xs-6">{{config.labels.language}}:</label>
+				<div class="col-xs-6">
+					<lan-select></lan-select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="nrOfQuestions" class="control-label col-xs-6">{{config.labels.questions}}:</label>
+				<div class="col-xs-6">
+					<input 
+						type="number" 
+						id="nrOfQuestions" 
+						ng-model="config.general.nrOfQuestions" 
+						min="1"
+						maxlength="2" 
+						autocomplete="off" 
+						ng-change="config.changed()"
+						class="form-control">
+				</div>
 			</div>
 		</div>
 	</div>
 
 	<div class="panel panel-primary">
-	    <div class="panel-heading" translate="content">Addition</div>
+		<div class="panel-heading" translate="content">Addition</div>
 		<div class="panel-body">
 			<div class="right">
 				{{config.labels.term}} 1:

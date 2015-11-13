@@ -1,6 +1,12 @@
 angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 
-.constant("DEFAULTS",{	'templateDir': 'views/directives/'})
+.constant("DEFAULTS",{	
+	'templateDir': 'views/directives/',
+	'languages': [
+		{'code': 'en', 'name':'English'}, 
+		{'code': 'nl', 'name': 'Nederlands'}
+		]
+	})
 
 .config(function($routeProvider){
 	var translationResolve = ['kmts', 
@@ -43,7 +49,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 	};
 })
 
-.service("config", function($http, settings, configFileName){
+.service("config", function($http, $log, settings, configFileName){
 	this.saveConfigFile = function(){
 		 var req = {
 			 method: 'POST',
@@ -54,7 +60,11 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 			 data: settings
 			};
 		$http(req).then(function(response) {
-			console.log("Saved config file");
+			$log.info("Saved config file");
+			return true;
+		}, function(){
+			$log.error("Error saving config file");
+			return false;
 		});
 	};
 })
@@ -228,7 +238,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 	};
 })
 
-.directive("calcConfig", function(config, settings, DEFAULTS, translate){
+.directive("calcConfig", function(config, settings, DEFAULTS, translate, kmtp){
 	return{
 		restrict: 'E',
 		replace: true,
@@ -237,15 +247,20 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 		controllerAs: 'config',
 		controller: function(){
 			this.range = settings.range;
-			this.nrOfQuestions = settings.nrOfQuestions;
+			this.general = settings.general;
 			this.updateConfig = function(){
-				config.saveConfigFile();
-				this.msg = translate.translate("Your changes have been submitted");
+				/*
+				if (config.saveConfigFile()){
+					this.msg = translate.translate("Your changes have been submitted");
+					kmtp.setCurrentLanguage(settings.general.language);
+				}
+				*/
 			};
 			this.changed = function(){
 				this.msg = "";
 			};
 			this.labels = {
+				"language": translate.translate("Language"),
 				"questions": translate.translate("No of questions"),
 				"total": translate.translate("Total"),
 				"term": translate.translate("Term"),
@@ -253,6 +268,22 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 				"max": translate.translate("max"),
 				"decimals": translate.translate("Decimals")
 			};
+		},
+		link: function(scope, element, attr) {
+        	scope.$watch('config.general.language', function(newLan, oldLan) {
+				if (oldLan !== newLan){
+					kmtp.setCurrentLanguage(newLan);
+				}
+			});
+		}
+	};
+})
+
+.directive("lanSelect", function(DEFAULTS){
+	return{
+		templateUrl: DEFAULTS.templateDir + 'lanselect.htm',
+		controller: function($scope){
+			$scope.config.languages = DEFAULTS.languages;
 		}
 	};
 })
@@ -281,7 +312,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 			this.nr = 1;
 			this.subview = "question";
 			this.subviewType = this.type === "addition" || this.type === "subtraction" ? "addsub" : this.type;
-			this.maxNr = settings.nrOfQuestions;
+			this.maxNr = settings.general.nrOfQuestions;
 			this.correct = [];
 			this.isWrongAnswer = false;
 			this.btnMessage = translate.translate(settings.btnMessage.active);
@@ -310,7 +341,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 				}
 			};
 			this.nextQuestion = function(){
-				if (this.nr < settings.nrOfQuestions){
+				if (this.nr < this.maxNr){
 					this.isWrongAnswer = false;
 					this.btnMessage = translate.translate(settings.btnMessage.active);
 					this.question.useranswer = "";
@@ -340,21 +371,21 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 })
 
 .directive('fixBackspace', function() {
-    return  function(scope, element, attr) {
-			element[0].onkeydown = function() {
-				//Remove last entered digit if backspace key is pressed
-				var key = event.keyCode || event.charCode,
-					no = this.value.toString(),
-					newno = "";
-				for (var i = no.length - 1; i > 0; i--){
-					newno = no[i] + newno;
-				}
-				newno += ' ';
-				if (key === 8){
-					this.value = newno;
-				}
-			};
-    };
+	return function(scope, element, attr) {
+		element[0].onkeydown = function() {
+			//Remove last entered digit if backspace key is pressed
+			var key = event.keyCode || event.charCode,
+				no = this.value.toString(),
+				newno = "";
+			for (var i = no.length - 1; i > 0; i--){
+				newno = no[i] + newno;
+			}
+			newno += ' ';
+			if (key === 8){
+				this.value = newno;
+			}
+		};
+	};
 })
 
 .directive('exerciseProgress', function(DEFAULTS) {
@@ -392,7 +423,7 @@ angular.element(document).ready(function () {
 				.value('settings', configResponse.data)
 				.value("configFileName", configFileName)
 				.config(['kmtpProvider', function(kmtpProvider){
-					kmtpProvider.configSetCurrentLanguage("nl");
+					kmtpProvider.configSetCurrentLanguage(configResponse.data.general.language);
 					kmtpProvider.configSetTranslationFile("assets/json/translate.json", "lan");
 				}]);
 				angular.bootstrap(document, ['kmCalc'], true);

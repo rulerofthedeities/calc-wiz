@@ -1,5 +1,8 @@
 {
-	"nrOfQuestions": 5,
+	"general": {
+		"language": "nl",
+		"nrOfQuestions": 5
+	},
 	"range":{
 		"addition": {
 			"t1": {"min": 101, "max": 9999},
