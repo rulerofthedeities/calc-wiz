@@ -23,6 +23,8 @@ span.icon {
     margin-bottom: 0;
 }
 
+/* ui-bootstrap */
+.nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
 
 /********************/
 /* show mobile menu */

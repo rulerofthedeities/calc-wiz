@@ -9,14 +9,13 @@
         </button>
 		<span class="navbar-brand">{{title}}</span>
 	</div>
-	<nav uib-collapse="isHeaderCollapsed" class="collapse navbar-collapse">
+	<nav uib-collapse="isHeaderCollapsed">
 		<ul class="nav navbar-nav">
 			<li><a href="#/results"><i class="fa fa-file-o"></i> <span translate="content">Results</span></a></li>
 			<li><a href="#/config"><i class="fa fa-wrench"></i> <span translate="content">Configuration</span></a></li>
 		</ul>
 		<ul class="nav navbar-nav navbar-right">
-			<li><a href="#/login"><i class="fa fa-unlock"></i> <span translate="content">Login</span></a></li>
+			<li><a ng-click="openModal()" ng-controller="loginCtrl"><i class="fa fa-unlock"></i> <span translate="content">Login</span></a></li>
 		</ul>
 	</nav>
-
 </header>

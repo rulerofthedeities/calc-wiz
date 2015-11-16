@@ -28,6 +28,10 @@
 		"Submit Answer": "Voer antwoord in",
 		"Next Question": "Volgende vraag",
 		"The correct answer is:": "Het juiste antwoord is:",
-		"Result": "Resultaat"
+		"Result": "Resultaat",
+
+		"Password": "Paswoord",
+		"Email": "Email",
+		"Remember me": "Onthou mij"
 	}
 }

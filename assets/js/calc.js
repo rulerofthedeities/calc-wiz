@@ -215,6 +215,45 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 	$scope.title = utils.capitalizeFirstLetter($routeParams.type);
 })
 
+
+.controller("loginCtrl", function($scope, $uibModal, $log){
+
+	var data = {};
+	data.email = "test@yahoo.com";
+
+	$scope.openModal = function (size) {
+		var modalInstance = $uibModal.open({
+			animation: false,
+			templateUrl: 'views/login.htm',
+			controller: 'modalLoginCtrl', 
+			size: size || 'md',
+			resolve: {
+				data: function () {
+					return data;
+				}
+			}
+		});
+		modalInstance.result.then(function (loginData) {
+	     	$log.info(loginData);
+	    }, function () {
+	    	//Modal closed
+	    });
+  	};
+
+})
+
+.controller('modalLoginCtrl', function ($scope, $uibModalInstance, translate, data) {
+	$scope.login = data;
+
+	$scope.ok = function () {
+		$uibModalInstance.close($scope.login);
+	};
+
+	$scope.cancel = function () {
+		$uibModalInstance.dismiss('cancel');
+	};
+})
+
 .directive("calcMenu", function(DEFAULTS){
 	return{
 		restrict: 'E',

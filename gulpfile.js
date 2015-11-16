@@ -10,27 +10,27 @@ var gulp = require('gulp'),
 	vendorJS 	= [
 				config.bowerDir + 'angular/angular.js',
 				config.bowerDir + 'angular-route/angular-route.js',
-				config.bowerDir + 'angular-bootstrap/ui-bootstrap.js'];
+				config.bowerDir + 'angular-bootstrap/ui-bootstrap-tpls.js'];
 
 	vendorCSS 	= [
 				config.bowerDir + 'bootstrap/dist/css/bootstrap.min.css',
 				config.bowerDir + 'font-awesome/css/font-awesome.min.css'];
 
 gulp.task('vendor_scripts', function() {
-  return gulp.src(vendorJS)
-    .pipe(concat('vendor.js'))
-    .pipe(gulp.dest('assets'));
+	return gulp.src(vendorJS)
+		.pipe(concat('vendor.js'))
+		.pipe(gulp.dest('assets/js'));
 });
 
 gulp.task('vendor_styles', function() {
-  return gulp.src(vendorCSS)
-    .pipe(concat('vendor.css'))
-    .pipe(gulp.dest('assets/css'));
+	return gulp.src(vendorCSS)
+		.pipe(concat('vendor.css'))
+		.pipe(gulp.dest('assets/css'));
 });
 
 gulp.task('vendor_fonts', function() {
-    return gulp.src(config.bowerDir + '/font-awesome/fonts/**.*')
-        .pipe(gulp.dest('assets/fonts'));
+	return gulp.src(config.bowerDir + '/font-awesome/fonts/**.*')
+		.pipe(gulp.dest('assets/fonts'));
 });
 
 gulp.task('default', ['vendor_scripts', 'vendor_styles', 'vendor_fonts']);
