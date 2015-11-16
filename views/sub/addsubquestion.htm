@@ -6,11 +6,11 @@
 		<input 
 			name="answer" 
 			ng-model="ctrl.question.useranswer" 
-			setfocus="ctrl.setFocus" 
-			auto-focus 
+			setfocus="ctrl.setFocus"
+			auto-focus
 			fix-backspace
+			caret="0"
 			autocomplete="off" 
-			ng-keyup="ctrl.setCursor($event)" 
 			ng-class="{'red':ctrl.isWrongAnswer}" 
 			ng-disabled="ctrl.isWrongAnswer"
 			required>

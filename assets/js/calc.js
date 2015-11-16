@@ -223,7 +223,8 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 
 	$scope.openModal = function (size) {
 		var modalInstance = $uibModal.open({
-			animation: false,
+			animation: true,
+			scope: $scope.$new(true),
 			templateUrl: 'views/login.htm',
 			controller: 'modalLoginCtrl', 
 			size: size || 'md',
@@ -338,7 +339,39 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 	};
 })
 
+.directive('caret', function() {
+
+    function setCaretPosition(elem, caretPos) {
+        if (elem !== null) {
+            if (elem.createTextRange) {
+                var range = elem.createTextRange();
+                range.move('character', caretPos);
+                range.select();
+            } else {
+                if (elem.selectionStart) {
+                    elem.focus();
+                    elem.setSelectionRange(caretPos, caretPos);
+                } else
+                    elem.focus();
+            }
+        }
+    }
+
+    return {
+        link: function(scope, element, attrs) {
+            var caret = Number(attrs.caret);
+            scope.$watch('ctrl.question.useranswer', function(newValue, oldValue) {
+                if (newValue && newValue != oldValue && !isNaN(newValue) ) {
+                    setCaretPosition(element[0], caret);
+                }
+            });
+        }
+    };
+})
+
+
 .directive("calcExercise", function(DEFAULTS, translate){
+
 	return {
 		restrict: 'E',
 		replace: true,
@@ -356,12 +389,6 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 			this.isWrongAnswer = false;
 			this.btnMessage = translate.translate(settings.btnMessage.active);
 			this.question = questions.getQuestion(this.type);
-			this.setCursor = function($event) {
-				var element = $event.target;
-				if(element.setSelectionRange){
-					element.setSelectionRange(0, 0, "backward");
-		    	}
-			};
 			this.submitAnswer = function(answer){
 				if (this.isWrongAnswer){
 					this.nextQuestion();
@@ -411,7 +438,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 
 .directive('fixBackspace', function() {
 	return function(scope, element, attr) {
-		element[0].onkeydown = function() {
+		element[0].onkeydown = function(event) {
 			//Remove last entered digit if backspace key is pressed
 			var key = event.keyCode || event.charCode,
 				no = this.value.toString(),
@@ -426,6 +453,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 		};
 	};
 })
+
 
 .directive('exerciseProgress', function(DEFAULTS) {
     return {
