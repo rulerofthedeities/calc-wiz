@@ -5,14 +5,19 @@
 	</div>
 	<form name="answerForm" ng-submit="answerForm.$valid && ctrl.submitAnswer(answer)" novalidate>
 		<div class="helpers pull-left">
-			<input type="text" class="helper" ng-repeat="field in ctrl.question.fields" ng-class="[field.offset, field.width]">
+			<input 
+				type="text" 
+				class="helper" 
+				ng-repeat="field in ctrl.question.fields" 
+				ng-class="[field.offset, field.width]">
 		</div>
 		<label class="sr-only" for="answer">Answer</label>
 		<input 
 			name="answer" 
 			ng-model="ctrl.question.useranswer" 
-			setfocus="ctrl.setFocus" 
 			auto-focus 
+			fix-backspace
+			caret="0"
 			autocomplete="off" 
 			ng-class="{'red':ctrl.isWrongAnswer}" 
 			ng-disabled="ctrl.isWrongAnswer"

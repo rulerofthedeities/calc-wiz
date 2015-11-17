@@ -351,20 +351,22 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
                 if (elem.selectionStart) {
                     elem.focus();
                     elem.setSelectionRange(caretPos, caretPos);
-                } else
-                    elem.focus();
+                }
             }
         }
     }
 
     return {
         link: function(scope, element, attrs) {
-            var caret = Number(attrs.caret);
-            scope.$watch('ctrl.question.useranswer', function(newValue, oldValue) {
-                if (newValue && newValue != oldValue && !isNaN(newValue) ) {
-                    setCaretPosition(element[0], caret);
-                }
-            });
+            var caret = Number(attrs.caret),
+            	field = attrs.ngModel;
+            if (field){
+	            scope.$watch(field, function(newValue, oldValue) {
+	                if (newValue && newValue != oldValue && !isNaN(newValue) ) {
+	                    setCaretPosition(element[0], caret);
+	                }
+	            });
+        	}
         }
     };
 })

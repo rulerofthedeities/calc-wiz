@@ -87,6 +87,7 @@ input[name=answer].red{color:red;}
 
 .helper{
 	border:1px dotted #ccc;
+	color:#777;
 }
 /** MULTIPLICATION **/
 
@@ -96,7 +97,7 @@ input[name=answer].red{color:red;}
 .multiplication .helper{
 	margin-bottom:4px;
 	width:200px;
-	direction: rtl;
+	text-align: right;
 }
 .multiplication input[name=answer]{
 	width:340px;

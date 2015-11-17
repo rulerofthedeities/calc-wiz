@@ -7,8 +7,9 @@
 				type="text" 
 				class="helper" 
 				ng-repeat="field in ctrl.question.fields" 
-				ng-keyup="ctrl.setCursor($event)" 
 				fix-backspace
+				caret="0"
+				ng-model="field.value"
 				autocomplete="off" 
 				ng-class="[field.offset, field.width]">
 		</div>
@@ -20,8 +21,8 @@
 			auto-focus 
 			fix-backspace
 			pull-right
+			caret="0"
 			autocomplete="off" 
-			ng-keyup="ctrl.setCursor($event)" 
 			ng-class="{'red':ctrl.isWrongAnswer}" 
 			ng-disabled="ctrl.isWrongAnswer"
 			ng-style="{width:(ctrl.question.ansLen * 46) + 'px'}"
