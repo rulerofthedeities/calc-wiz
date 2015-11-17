@@ -1,7 +1,8 @@
 {
 	"general": {
 		"language": "nl",
-		"nrOfQuestions": 5
+		"nrOfQuestions": 5,
+		"audio": true
 	},
 	"range":{
 		"addition": {

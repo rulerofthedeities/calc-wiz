@@ -255,7 +255,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
-.directive("calcAudio", function(DEFAULTS){
+.directive("calcAudio", function(DEFAULTS, settings){
 	return{
 		restrict: 'E',
 		templateUrl: DEFAULTS.templateDir + 'audio.htm',
@@ -265,7 +265,9 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 				audio.playPause();
 			};
 			$scope.$on('audio', function(event, args) {
-				$scope.playSound(args["sound"]);
+				if (settings.general.audio){
+					$scope.playSound(args.sound);
+				}
 			});
 		}
 	};
