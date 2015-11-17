@@ -10,6 +10,7 @@ var gulp = require('gulp'),
 	vendorJS 	= [
 				config.bowerDir + 'angular/angular.js',
 				config.bowerDir + 'angular-route/angular-route.js',
+				config.bowerDir + 'angular-media-player/dist/angular-media-player.js',
 				config.bowerDir + 'angular-bootstrap/ui-bootstrap-tpls.js'];
 
 	vendorCSS 	= [

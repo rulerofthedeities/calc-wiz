@@ -1,4 +1,4 @@
-angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
+angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlayer'])
 
 .constant("DEFAULTS",{	
 	'templateDir': 'views/directives/',
@@ -255,6 +255,22 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 	};
 })
 
+.directive("calcAudio", function(DEFAULTS){
+	return{
+		restrict: 'E',
+		templateUrl: DEFAULTS.templateDir + 'audio.htm',
+		controller: function($scope){
+			$scope.playSound = function (sound) {
+				var audio = $scope[sound];
+				audio.playPause();
+			};
+			$scope.$on('audio', function(event, args) {
+				$scope.playSound(args["sound"]);
+			});
+		}
+	};
+})
+
 .directive("calcMenu", function(DEFAULTS){
 	return{
 		restrict: 'E',
@@ -381,7 +397,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 		scope: {type:'@'},
     	bindToController: true,
     	controllerAs: 'ctrl',
-		controller: function(settings, questions, results){
+		controller: function($scope, settings, questions, results){
 			results.init();
 			this.nr = 1;
 			this.subview = "question";
@@ -399,15 +415,18 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate'])
 					if (parseInt(this.question.useranswer, 10) === this.question.answer){
 						results.addResult(this.question, true, this.nr);
 						this.correct[this.nr - 1] = true;
+						$scope.$emit('audio', {'sound':'ok'});
 						this.nextQuestion();
 					} else {
 						results.addResult(this.question, false, this.nr);
 						this.correct[this.nr - 1] = false;
 						this.isWrongAnswer = true;
 						this.btnMessage = translate.translate(settings.btnMessage.inActive);
+						$scope.$emit('audio', {'sound':'nok'});
 					}
 				}
 			};
+
 			this.nextQuestion = function(){
 				if (this.nr < this.maxNr){
 					this.isWrongAnswer = false;
