@@ -3,28 +3,27 @@
 		<pre><span class="term">{{ctrl.question.terms[1]}}</span><span class="term term2">|{{ctrl.question.terms[2]}}</span></pre>
 		
 	</div>
-	<form name="answerForm" ng-submit="answerForm.$valid && ctrl.submitAnswer(answer)" novalidate>
+	<form name="answerForm" ng-submit="answerForm.$valid && ctrl.submitAnswer()" novalidate>
 		<div class="helpers pull-left">
 			<input 
 				type="text" 
 				class="helper" 
-				ng-repeat="field in ctrl.question.fields" 
+				ng-repeat="field in ctrl.question.helpFields" 
 				ng-class="[field.offset, field.width]">
 		</div>
 		<label class="sr-only" for="answer">Answer</label>
 		<input 
 			name="answer" 
-			ng-model="ctrl.question.useranswer" 
+			ng-model="ctrl.question.userAnswer" 
 			auto-focus 
-			fix-backspace
-			caret="0"
 			autocomplete="off" 
 			ng-class="{'red':ctrl.isWrongAnswer}" 
 			ng-disabled="ctrl.isWrongAnswer"
-			class="pull-left"
+			class="pull-left div"
 			required>
 		<div class="clearfix"></div>
-		<div ng-hide="!ctrl.isWrongAnswer" class="msg text-danger">The correct answer is: {{ctrl.question.answer}}</div>
-		<button type="submit" class="btn btn-success btn-lg" ng-disabled="answerForm.$invalid">{{ctrl.btnMessage}}</button> 
+		<div ng-hide="!ctrl.isWrongAnswer" class="msg text-danger">{{'The correct answer is:'|translate}} {{ctrl.correctAnswer.answer}}</div>
+		<button type="submit" class="btn btn-success btn-lg" ng-disabled="answerForm.$invalid" ng-hide="ctrl.isWrongAnswer">{{ctrl.btnMessageCorrect}}</button> 
+		<button ng-click="ctrl.nextQuestion()" class="btn btn-success btn-lg" ng-hide="!ctrl.isWrongAnswer">{{ctrl.btnMessageIncorrect}}</button> 
 	</form>
 </div>

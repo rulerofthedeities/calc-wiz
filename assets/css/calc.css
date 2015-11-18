@@ -84,6 +84,7 @@ input[name=answer]{
 	color:blue;
 }
 input[name=answer].red{color:red;}
+input[name=answer].div{text-align: left;}
 
 .helper{
 	border:1px dotted #ccc;

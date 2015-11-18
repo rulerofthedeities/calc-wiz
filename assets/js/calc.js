@@ -70,6 +70,12 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 })
 
 .service("questions", function(settings, utils){
+	function Question(args){
+		this.tpe = args.tpe;
+		this.operator = settings.operator[args.tpe].label;
+		this.userAnswer = null;
+	}
+
 	this._getTerms = function(tpe){
 		var range = settings.range[tpe],
 			term1 = utils.getRandomInt(range.t1.min, range.t1.max),
@@ -115,7 +121,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		return {term1: term1, term2:term2};
 	};
 
-	this._getHelpFields = function(tpe, terms){
+	this._getHelpFields = function(terms, tpe){
 		var nrOfHelpFields = 0,
 			fields = [],
 			indx;
@@ -153,41 +159,101 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		return len;
 	};
 
-	this.getQuestion = function(tpe){
-		var terms = {},
-			len = 0,
-			answer; 
+	this.getAnswer = function(terms, tpe){
+		var answer,
+			remainder;
 
-		terms = this._getTerms(tpe);
-		len = this._getLen(terms, tpe);
-		answer = eval(terms.term1 + settings.operator[tpe].operator + terms.term2);
+		answer = eval(terms["1"] + settings.operator[tpe].operator + terms["2"]);
 		if (tpe === "division"){
 			var div = Math.pow(10, settings.range.division.decimals);
 			answer = Math.floor(answer * div) / div;
 		}
-		return {
-			terms: {
-				1: utils.pad(terms.term1, " ", len), 
-				2: tpe !== "division" ? utils.pad(terms.term2, " ", len) : terms.term2
-			},
-			operator: settings.operator[tpe].label,
-			len: len,
-			fields: this._getHelpFields(tpe, terms),
-			answer: answer,
-			ansLen: answer.toString().length
+
+		return {'answer':answer, 'remainder':remainder};
+	};
+
+	this.getQuestion = function(tpe){
+		var question = new Question({'tpe': tpe}),
+			terms = this._getTerms(tpe),
+			termLen = this._getLen(terms, tpe),
+			answer;
+
+		question.helpFields = this._getHelpFields(terms, tpe);
+		terms = {
+			1: utils.pad(terms.term1, " ", termLen), 
+			2: tpe !== "division" ? utils.pad(terms.term2, " ", termLen) : terms.term2.toString()
+		};
+		answer = this.getAnswer(terms, tpe);
+		question.termLen = termLen;
+		question.answLen = answer.answer.toString().length;
+		question.terms = terms;
+
+		return {'question': question, 'answer': answer};
+	};
+
+	this.getQuestions = function(tpe){
+		var questions = [],
+			answers = [],
+			question;
+		for (var indx = 0; indx < settings.general.nrOfQuestions; indx++){
+			question = this.getQuestion(tpe);
+			questions.push(question.question);
+			answers.push(question.answer);
+		}
+		return {'questions': questions, 'answers': answers};
+	};
+
+	this.checkAnswer = function(){
+		return function(userAnswer, correctAnswer){
+			var correct = false;
+			if (userAnswer.answer == correctAnswer.answer){
+				if (correctAnswer.remainder) {
+					if (correctAnswer.remainder == userAnswer.remainder){
+						correct = true;
+					}
+				} else {
+					correct = true;
+				}
+			}
+			return correct;
 		};
 	};
+
+})
+
+.service("exercise", function(questions, settings){
+
+	function Exercise(args){
+		this.tpe = args.tpe;
+		this.nrOfQuestions = settings.general.nrOfQuestions;
+		this.started = Date.now();
+		this.ended = function(){
+			return Date.now();
+		};
+	}
+
+	this.createExercise = function(tpe){
+		var exercise = new Exercise({'tpe' : tpe}),
+			exQuestions = questions.getQuestions(tpe);
+
+		exercise.questions = exQuestions.questions;
+		exercise.answers = exQuestions.answers;
+		exercise.checkAnswer = questions.checkAnswer;
+		return exercise;
+	};
+
 })
 
 .service("results", function(){
 	this.init = function(){
 		this.results = {questions:[]};
 	};
-	this.addResult = function(question, correct, nr){
+	this.addResult = function(question, userAnswer, correctAnswer, correct, nr){
 		var result = {
 			nr: nr + 1,
 			question: question, 
-			answer: question.useranswer,
+			userAnswer: userAnswer,
+			correctAnswer: correctAnswer,
 			correct: correct
 		};
 		this.results.questions.push(result);
@@ -399,49 +465,55 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		scope: {type:'@'},
     	bindToController: true,
     	controllerAs: 'ctrl',
-		controller: function($scope, settings, questions, results){
-			results.init();
-			this.nr = 1;
-			this.subview = "question";
-			this.subviewType = this.type === "addition" || this.type === "subtraction" ? "addsub" : this.type;
-			this.maxNr = settings.general.nrOfQuestions;
-			this.correct = [];
-			this.isWrongAnswer = false;
-			this.btnMessage = translate.translate(settings.btnMessage.active);
-			this.question = questions.getQuestion(this.type);
-			this.submitAnswer = function(answer){
-				if (this.isWrongAnswer){
+		controller: function($scope, exercise, settings, results){
+			var calcExercise = exercise.createExercise(this.type),
+				correctAnswer;
+
+			this.init = function(){
+				this.question = calcExercise.questions[this.nr - 1];
+				correctAnswer = calcExercise.answers[this.nr - 1];
+				this.isWrongAnswer = false;
+				this.setFocus = true;
+			};
+
+			this.submitAnswer = function(){
+				var answer = {'answer': this.question.userAnswer, 'remainder': this.question.remainder},
+					correct = calcExercise.checkAnswer()(answer, correctAnswer);
+				
+				results.addResult(this.question, answer, correctAnswer, correct, this.nr);
+				this.correct[this.nr - 1] = correct;
+
+				if (correct){
+					$scope.$emit('audio', {'sound':'ok'});
 					this.nextQuestion();
 				} else {
-					this.question.nr = this.nr;
-					if (parseInt(this.question.useranswer, 10) === this.question.answer){
-						results.addResult(this.question, true, this.nr);
-						this.correct[this.nr - 1] = true;
-						$scope.$emit('audio', {'sound':'ok'});
-						this.nextQuestion();
-					} else {
-						results.addResult(this.question, false, this.nr);
-						this.correct[this.nr - 1] = false;
-						this.isWrongAnswer = true;
-						this.btnMessage = translate.translate(settings.btnMessage.inActive);
-						$scope.$emit('audio', {'sound':'nok'});
-					}
+					$scope.$emit('audio', {'sound':'nok'});
+					this.isWrongAnswer = true;
+					this.correctAnswer = correctAnswer;
 				}
 			};
 
 			this.nextQuestion = function(){
 				if (this.nr < this.maxNr){
-					this.isWrongAnswer = false;
-					this.btnMessage = translate.translate(settings.btnMessage.active);
-					this.question.useranswer = "";
-					this.setFocus = true;
-					this.question = questions.getQuestion(this.type);
 					this.nr++;
+					this.init();
 				} else {
+					calcExercise.ended();
 					this.results = results.getResults();
 					this.subview = "results";
 				}
 			};
+
+			this.nr = 1;
+			this.subview = "question";
+			this.subviewType = this.type === "addition" || this.type === "subtraction" ? "addsub" : this.type;
+			this.maxNr = settings.general.nrOfQuestions;
+			this.correct = [];
+			this.btnMessageCorrect = translate.translate(settings.btnMessage.active);
+			this.btnMessageIncorrect = translate.translate(settings.btnMessage.inActive);
+			
+			results.init();
+			this.init();
 		}
 	};
 })

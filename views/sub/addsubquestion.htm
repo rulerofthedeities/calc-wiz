@@ -1,11 +1,11 @@
 <div id="question">
 	<div class="term">{{ctrl.question.terms[1]}}</div>
 	<div class="term term2"><span id="operator">{{ctrl.question.operator}}</span>{{ctrl.question.terms[2]}}</div>
-	<form name="answerForm" ng-submit="answerForm.$valid && ctrl.submitAnswer(answer)" novalidate>
+	<form name="answerForm" ng-submit="answerForm.$valid && ctrl.submitAnswer()" novalidate>
 		<label class="sr-only" for="answer" translate="content">Answer</label>
 		<input 
 			name="answer" 
-			ng-model="ctrl.question.useranswer" 
+			ng-model="ctrl.question.userAnswer" 
 			setfocus="ctrl.setFocus"
 			auto-focus
 			fix-backspace
@@ -14,7 +14,8 @@
 			ng-class="{'red':ctrl.isWrongAnswer}" 
 			ng-disabled="ctrl.isWrongAnswer"
 			required>
-		<div ng-hide="!ctrl.isWrongAnswer" class="msg text-danger">{{'The correct answer is:'|translate}} {{ctrl.question.answer}}</div>
-		<button type="submit" class="btn btn-success btn-lg" ng-disabled="answerForm.$invalid">{{ctrl.btnMessage}}</button> 
+		<div ng-hide="!ctrl.isWrongAnswer" class="msg text-danger">{{'The correct answer is:'|translate}} {{ctrl.correctAnswer.answer}}</div>
+		<button type="submit" class="btn btn-success btn-lg" ng-disabled="answerForm.$invalid" ng-hide="ctrl.isWrongAnswer">{{ctrl.btnMessageCorrect}}</button> 
+		<button ng-click="ctrl.nextQuestion()" class="btn btn-success btn-lg" ng-hide="!ctrl.isWrongAnswer">{{ctrl.btnMessageIncorrect}}</button> 
 	</form>
 </div>
