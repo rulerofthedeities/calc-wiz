@@ -259,6 +259,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	this.init = function(){
 		this.results = {questions:[]};
 	};
+
 	this.addResult = function(question, userAnswer, correctAnswer, correct, nr){
 		var result = {
 			nr: nr + 1,
@@ -269,6 +270,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		};
 		this.results.questions.push(result);
 	};
+
 	this._processResults = function(){
 		for(var indx = 0, countCorrect = 0; indx < this.results.questions.length; indx++){
 			if(this.results.questions[indx].correct) {
@@ -281,6 +283,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			percentage: countCorrect / this.results.questions.length * 100
 		};
 	};
+
 	this.getResults = function(){
 		this._processResults();
 		return this.results;
@@ -380,10 +383,12 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		scope: {},
 		templateUrl: DEFAULTS.templateDir + 'config.htm',
 		controllerAs: 'config',
-		controller: function(){
+		controller: function($scope){
 			this.range = settings.range;
 			this.general = settings.general;
 			this.updateConfig = function(){
+				this.msg = translate.translate("Your changes have been submitted");
+				$scope.configForm.$setPristine();
 				/*
 				if (config.saveConfigFile()){
 					this.msg = translate.translate("Your changes have been submitted");
@@ -391,18 +396,17 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 				}
 				*/
 			};
-			this.changed = function(){
-				this.msg = "";
-			};
 			this.labels = {
 				"language": translate.translate("Language"),
 				"questions": translate.translate("No of questions"),
+				"audio": translate.translate("Audio"),
 				"total": translate.translate("Total"),
 				"term": translate.translate("Term"),
 				"min": translate.translate("min"),
 				"max": translate.translate("max"),
-				"decimals": translate.translate("Decimals")
+				"remainder": translate.translate("Remainder")
 			};
+			
 		},
 		link: function(scope, element, attr) {
         	scope.$watch('config.general.language', function(newLan, oldLan) {
@@ -410,6 +414,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 					kmtp.setCurrentLanguage(newLan);
 				}
 			});
+
 		}
 	};
 })
@@ -563,7 +568,6 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		};
 	};
 })
-
 
 .directive('exerciseProgress', function(DEFAULTS) {
     return {

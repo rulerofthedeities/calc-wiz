@@ -23,7 +23,7 @@
 		"division": {
 			"t1": {"min": 120, "max": 9999},
 			"t2": {"min": 11, "max": 99},
-			"decimals": 1
+			"remainder": true
 		}
 	},
 	"operator":{

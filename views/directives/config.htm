@@ -18,7 +18,6 @@
 						min="1"
 						maxlength="2" 
 						autocomplete="off" 
-						ng-change="config.changed()"
 						class="form-control">
 				</div>
 			</div>
@@ -26,7 +25,10 @@
                 <div class="col-xs-offset-6 col-xs-6">
                     <div class="checkbox">
                         <label>
-                            <input name="audio" type="checkbox" ng-model="config.general.audio"><span translate="content">Audio</span>
+                            <input 
+                            	name="audio" 
+                            	type="checkbox" 
+                            	ng-model="config.general.audio">{{config.labels.audio}}
                         </label>
                     </div>
                 </div>
@@ -45,16 +47,14 @@
 						ng-model="config.range.addition.t1.min" 
 						min="0" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off">
 				{{config.labels.max}}: <input 
 						type="number" 
 						name="additionMax1" 
 						ng-model="config.range.addition.t1.max" 
 						min="{{config.range.addition.t1.min + 1}}" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off">
 			</div>
 			<div class="right">
 				{{config.labels.term}} 2:
@@ -65,16 +65,14 @@
 						min="0" 
 						max="{{config.range.addition.t2.max -1}}" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off">
 				{{config.labels.max}}: <input 
 						type="number" 
 						name="additionMax2" 
 						ng-model="config.range.addition.t2.max" 
 						min="{{config.range.addition.t2.min + 1}}" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off">
 			</div>
 			<div class="right underscore"><span>+</span> ____________________</div>
 			<div class="right">
@@ -92,8 +90,7 @@
 						name="additionResultMax" 
 						ng-model="config.range.addition.result.max" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off">
 			</div>
 		</div>
 	</div>
@@ -109,16 +106,14 @@
 						ng-model="config.range.subtraction.t1.min" 
 						min="{{config.range.subtraction.t2.min + 1}}" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off">
 				{{config.labels.max}}: <input 
 						type="number" 
 						name="subtractionMax1" 
 						ng-model="config.range.subtraction.t1.max" 
 						min="{{config.range.subtraction.t1.min + 1}}" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off">
 			</div>
 			<div class="right">
 				{{config.labels.term}} 2:
@@ -137,8 +132,7 @@
 						ng-model="config.range.subtraction.t2.max" 
 						min="{{config.range.subtraction.t2.min + 1}}" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off">
 			</div>
 			<div class="right underscore"><span>-</span> ____________________</div>
 			<div class="right">
@@ -157,8 +151,7 @@
 						ng-model="config.range.subtraction.result.max" 
 						min="{{config.range.subtraction.result.min + 1}}" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off">
 			</div>
 		</div>
 	</div>
@@ -182,8 +175,7 @@
 						ng-model="config.range.multiplication.t1.max" 
 						min="{{config.range.multiplication.t1.min + 1}}" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off" >
 			</div>
 			<div class="right">
 				{{config.labels.term}} 2:
@@ -201,8 +193,7 @@
 						ng-model="config.range.multiplication.t2.max" 
 						min="{{config.range.multiplication.t2.min + 1}}" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off" >
 			</div>
 			<div class="right underscore"><span>x</span> ____________________</div>
 			<div class="right">
@@ -220,8 +211,7 @@
 						name="multiplicationResultMax" 
 						ng-model="config.range.multiplication.result.max" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off" >
 			</div>
 		</div>
 	</div>
@@ -237,16 +227,14 @@
 						ng-model="config.range.division.t1.min" 
 						min="11" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off" >
 				{{config.labels.max}}: <input 
 						type="number" 
 						name="divisionMax1" 
 						ng-model="config.range.division.t1.max" 
 						min="{{config.range.division.t1.min + 1}}" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off" >
 			</div>
 			<div class="right">
 				{{config.labels.term}} 2:
@@ -257,34 +245,30 @@
 						min="0" 
 						max="{{config.range.division.t1.max - 1}}" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off" >
 				{{config.labels.max}}: <input 
 						type="number" 
 						name="divisionMax2" 
 						ng-model="config.range.division.t2.max" 
 						min="{{config.range.division.t2.min + 1}}" 
 						maxlength="6" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+						autocomplete="off" >
 			</div>
 			<br>
-			<div class="center">
-				{{config.labels.decimals}}: 
+			<div class="left">
 				<input 
-						type="number" 
-						name="divisionDecimals" 
-						ng-model="config.range.division.decimals" 
-						min="0" 
-						max="10" 
-						maxlength="1" 
-						autocomplete="off" 
-						ng-change="config.changed()">
+					name="remainder" 
+					type="checkbox" 
+					ng-model="config.range.division.remainder">{{config.labels.remainder}}
 			</div>
 		</div>
 	</div>
-	<button style="submit" class="btn btn-success" translate="content">Submit changes</button>
-	<div>{{config.msg}}</div>
+	<div ng-hide="configForm.$dirty">{{config.msg}}</div>
+	<button 
+		style="submit" 
+		class="btn btn-success" 
+		ng-disabled="configForm.$pristine" 
+		translate="content">Submit changes</button>
 </form>
 
 
