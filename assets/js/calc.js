@@ -49,6 +49,17 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
+.factory("setFocus", function($timeout, $window){
+	return function(id) {
+		$timeout(function() {
+			var element = $window.document.getElementById(id);
+			if(element){
+				element.focus();
+			}
+		});
+	};
+})
+
 .service("config", function($http, $log, settings, configFileName){
 	this.saveConfigFile = function(){
 		 var req = {
@@ -456,7 +467,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 })
 
 
-.directive("calcExercise", function(DEFAULTS, translate){
+.directive("calcExercise", function(DEFAULTS, translate, setFocus){
 
 	return {
 		restrict: 'E',
@@ -490,6 +501,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 					$scope.$emit('audio', {'sound':'nok'});
 					this.isWrongAnswer = true;
 					this.correctAnswer = correctAnswer;
+					setFocus('wrongnext');
 				}
 			};
 
