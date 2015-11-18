@@ -479,7 +479,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			this.submitAnswer = function(){
 				var answer = {'answer': this.question.userAnswer, 'remainder': this.question.remainder},
 					correct = calcExercise.checkAnswer()(answer, correctAnswer);
-				
+
 				results.addResult(this.question, answer, correctAnswer, correct, this.nr);
 				this.correct[this.nr - 1] = correct;
 
@@ -501,6 +501,9 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 					calcExercise.ended();
 					this.results = results.getResults();
 					this.subview = "results";
+					if (this.results.totals.percentage == 100){
+						$scope.$emit('audio', {'sound':'cheer'});
+					}
 				}
 			};
 
