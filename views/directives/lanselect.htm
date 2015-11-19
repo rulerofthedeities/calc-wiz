@@ -1,7 +1,3 @@
-<select 
-	id="language" 
-	ng-model="config.general.language" 
-	ng-change="config.changed()"
-	class="form-control">
-	<option ng-repeat="lan in config.languages" value="{{lan.code}}">{{lan.name}}</option>
-</select>
+<label ng-repeat="lan in config.languages">
+	<input ng-model="config.general.language" type="radio" name="language" ng-value="lan.code">{{lan.name}}
+</label>
