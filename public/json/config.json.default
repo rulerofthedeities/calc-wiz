@@ -1,6 +1,9 @@
 {
-	"language": "en",
-	"nrOfQuestions": 5,
+	"general": {
+		"language": "nl",
+		"nrOfQuestions": 5,
+		"audio": true
+	},
 	"range":{
 		"addition": {
 			"t1": {"min": 101, "max": 9999},
@@ -20,7 +23,7 @@
 		"division": {
 			"t1": {"min": 120, "max": 9999},
 			"t2": {"min": 11, "max": 99},
-			"decimals": 1
+			"remainder": true
 		}
 	},
 	"operator":{

@@ -392,14 +392,11 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			this.range = settings.range;
 			this.general = settings.general;
 			this.updateConfig = function(){
-				this.msg = translate.translate("Your changes have been submitted");
-				$scope.configForm.$setPristine();
-				/*
 				if (config.saveConfigFile()){
 					this.msg = translate.translate("Your changes have been submitted");
 					kmtp.setCurrentLanguage(settings.general.language);
+					$scope.configForm.$setPristine();
 				}
-				*/
 			};
 			this.labels = {
 				"language": translate.translate("Language"),
@@ -597,8 +594,8 @@ angular.element(document).ready(function () {
 	var initInjector = angular.injector(['ng']),
 		$http = initInjector.get('$http'),
 		$log = initInjector.get('$log'),
-		configFileName = "assets/json/config.json",
-		translateFileName = "assets/json/translate.json",
+		configFileName = "json/config.json",
+		translateFileName = "json/translate.json",
 		promise = $http.get(configFileName);
 
 	promise.then(
@@ -610,7 +607,7 @@ angular.element(document).ready(function () {
 				.value("configFileName", configFileName)
 				.config(['kmtpProvider', function(kmtpProvider){
 					kmtpProvider.configSetCurrentLanguage(configResponse.data.general.language);
-					kmtpProvider.configSetTranslationFile("assets/json/translate.json", "lan");
+					kmtpProvider.configSetTranslationFile("json/translate.json", "lan");
 				}]);
 				angular.bootstrap(document, ['kmCalc'], true);
 		},
