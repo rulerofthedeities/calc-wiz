@@ -8,9 +8,17 @@
 			<span id="operator">{{result.question.operator}}</span>
 			{{result.question.terms[2]}}
 		</div>
-		<div class="term ok" ng-class="{'nok':!result.correct}">{{result.userAnswer.answer}}</div>
-		<div ng-if="!result.correct" class="correction">
-			{{result.correctAnswer.answer}}
+		<div class="term ok" ng-class="{'nok':!result.correct.answer}">
+			{{result.userAnswer.answer}}
+		</div>
+		<div ng-if="!result.correct.answer" class="correction">
+			({{result.correctAnswer.answer}})
+		</div>
+		<div ng-hide="!result.userAnswer.remainder" class="remainder">
+			{{'Remainder'|translate}}: <span class="term ok remainder" ng-class="{'nok':!result.correct.remainder}">{{result.userAnswer.remainder}}</span>
+		</div>
+		<div ng-hide="result.correct.remainder" class="remainder">
+			{{'Remainder'|translate}}: (<span class="correction remainder">{{result.correctAnswer.remainder}}</span>)
 		</div>
 	</div>
 </div>

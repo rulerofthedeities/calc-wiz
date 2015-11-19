@@ -23,12 +23,12 @@
 			pull-right
 			caret="0"
 			autocomplete="off" 
-			ng-class="{'red':ctrl.isWrongAnswer}" 
-			ng-disabled="ctrl.isWrongAnswer"
+			ng-class="{'red':!ctrl.isCorrectAnswer.answer}" 
+			ng-disabled="!ctrl.isCorrectAnswer.all"
 			ng-style="{width:(ctrl.question.ansLen * 46) + 'px'}"
 			required>
 		<div ng-hide="!ctrl.isWrongAnswer" class="msg text-danger">{{'The correct answer is:'|translate}} {{ctrl.correctAnswer.answer}}</div>
-		<button type="submit" class="btn btn-success btn-lg" ng-disabled="answerForm.$invalid" ng-hide="ctrl.isWrongAnswer">{{ctrl.btnMessageCorrect}}</button> 
-		<button id="wrongnext" ng-click="ctrl.nextQuestion()" class="btn btn-success btn-lg" ng-hide="!ctrl.isWrongAnswer">{{ctrl.btnMessageIncorrect}}</button> 
+		<button type="submit" class="btn btn-success btn-lg" ng-disabled="answerForm.$invalid" ng-hide="!ctrl.isCorrectAnswer.all">{{ctrl.btnMessageCorrect}}</button> 
+		<button id="wrongnext" ng-click="ctrl.nextQuestion()" class="btn btn-success btn-lg" ng-hide="ctrl.isCorrectAnswer.all">{{ctrl.btnMessageIncorrect}}</button> 
 	</form>
 </div>

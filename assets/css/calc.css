@@ -76,20 +76,25 @@ pre{
 	font-size:16px;
 	line-height:18px;
 }
-input[name=answer]{
+input[name=answer],input[name=remainder]{
 	width:200px;
 	text-align: right;
-	border:none;
+	border:2px dashed blue;
 	outline: 0;
 	color:blue;
+	margin-top:2px;
+	padding-left:2px;
 }
-input[name=answer].red{color:red;}
-input[name=answer].div{text-align: left;}
-
-.helper{
+input[name=answer].red,input[name=remainder].red{color:red;}
+input[name=answer].div,input[name=remainder].div{text-align: left;}
+.remainder{
+	font-size: 18px;
+}
+.helper, input[name=remainder]{
 	border:1px dotted #ccc;
 	color:#777;
 }
+input[name=remainder]{border-color:blue;}
 /** MULTIPLICATION **/
 
 #exercise.multiplication{
@@ -159,17 +164,21 @@ input[name=answer].div{text-align: left;}
 	padding:40px;
 	min-height: 270px;
 }
-.exercise > .nok{
+.exercise .nok{
 	text-decoration: line-through;
 }
 .exercise > .correction{
 	font-size: 20px;
+	font-style: italic;
 	position: relative;
 	top:-10px;
 }
 .exercise > .nr{
 	font-size: 16px;
 	float:left;
+}
+.exercise .remainder{
+	font-size: 12px;
 }
 
 /************/

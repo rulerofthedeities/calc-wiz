@@ -84,6 +84,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	function Question(args){
 		this.tpe = args.tpe;
 		this.operator = settings.operator[args.tpe].label;
+		this.hasRemainder = settings.range.division.remainder;
 		this.userAnswer = null;
 	}
 
@@ -119,10 +120,15 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 				}
 				break;
 			case "division": 
-				if (settings.range.division.decimals === 0){
-					term1 = term2 * utils.getRandomInt(Math.floor(range.t1.min / range.t2.min), Math.floor(range.t1.max /range.t2.max));
+				var checkIfTerm2FitsInTerm1 = function(term1, term2){
+					return parseInt(term1.toString().slice(0, term2.toString().length), 10) < term2;
+				};
+				if (!settings.range.division.remainder){
+					do {
+						term1 = term2 * utils.getRandomInt(Math.floor(range.t1.min / range.t2.min), Math.floor(range.t1.max /range.t2.max));
+					} while (checkIfTerm2FitsInTerm1(term1, term2));
 				} else {
-					while (parseInt(term1.toString().slice(0, term2.toString().length), 10) < term2){
+					while (checkIfTerm2FitsInTerm1(term1, term2)){
 						term1 = utils.getRandomInt(range.t1.min, range.t1.max);
 						term2 = utils.getRandomInt(range.t2.min, range.t2.max);
 					}
@@ -176,8 +182,8 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 		answer = eval(terms["1"] + settings.operator[tpe].operator + terms["2"]);
 		if (tpe === "division"){
-			var div = Math.pow(10, settings.range.division.decimals);
-			answer = Math.floor(answer * div) / div;
+			answer = Math.floor(answer);
+			remainder = parseInt(terms[1], 10) % parseInt(terms[2], 10);
 		}
 
 		return {'answer':answer, 'remainder':remainder};
@@ -216,16 +222,15 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 	this.checkAnswer = function(){
 		return function(userAnswer, correctAnswer){
-			var correct = false;
-			if (userAnswer.answer == correctAnswer.answer){
-				if (correctAnswer.remainder) {
-					if (correctAnswer.remainder == userAnswer.remainder){
-						correct = true;
-					}
-				} else {
-					correct = true;
-				}
+			var correct = {'answer':false, 'remainder':true, 'all':false};
+
+			if (parseInt(userAnswer.answer, 10) === correctAnswer.answer){
+				correct.answer = true;
 			}
+			if (correctAnswer.remainder && parseInt(userAnswer.remainder, 10) !== correctAnswer.remainder){
+				correct.remainder = false;
+			}
+			correct.all = correct.answer && correct.remainder;
 			return correct;
 		};
 	};
@@ -273,7 +278,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 	this._processResults = function(){
 		for(var indx = 0, countCorrect = 0; indx < this.results.questions.length; indx++){
-			if(this.results.questions[indx].correct) {
+			if(this.results.questions[indx].correct.all) {
 				countCorrect++;
 			}
 		}
@@ -488,7 +493,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			this.init = function(){
 				this.question = calcExercise.questions[this.nr - 1];
 				correctAnswer = calcExercise.answers[this.nr - 1];
-				this.isWrongAnswer = false;
+				this.isCorrectAnswer = {'answer': true, 'remainder': true, 'all': true};
 				this.setFocus = true;
 			};
 
@@ -497,14 +502,14 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 					correct = calcExercise.checkAnswer()(answer, correctAnswer);
 
 				results.addResult(this.question, answer, correctAnswer, correct, this.nr);
-				this.correct[this.nr - 1] = correct;
+				this.correct[this.nr - 1] = correct.all;
 
-				if (correct){
+				if (correct.all){
 					$scope.$emit('audio', {'sound':'ok'});
 					this.nextQuestion();
 				} else {
 					$scope.$emit('audio', {'sound':'nok'});
-					this.isWrongAnswer = true;
+					this.isCorrectAnswer = correct;
 					this.correctAnswer = correctAnswer;
 					setFocus('wrongnext');
 				}

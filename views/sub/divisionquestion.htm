@@ -11,19 +11,30 @@
 				ng-repeat="field in ctrl.question.helpFields" 
 				ng-class="[field.offset, field.width]">
 		</div>
-		<label class="sr-only" for="answer">Answer</label>
+		<label class="sr-only" for="answer" translate="content">Answer</label>
 		<input 
 			name="answer" 
 			ng-model="ctrl.question.userAnswer" 
 			auto-focus 
 			autocomplete="off" 
-			ng-class="{'red':ctrl.isWrongAnswer}" 
-			ng-disabled="ctrl.isWrongAnswer"
+			ng-class="{'red':!ctrl.isCorrectAnswer.answer}" 
+			ng-disabled="!ctrl.isCorrectAnswer.all"
 			class="pull-left div"
 			required>
+		<div ng-if="ctrl.question.hasRemainder">
+		<div class="remainder">{{'Remainder'|translate}}:</div> <input 
+			name="remainder" 
+			ng-model="ctrl.question.remainder" 
+			autocomplete="off" 
+			ng-class="{'red':!ctrl.isCorrectAnswer.remainder}" 
+			ng-disabled="!ctrl.isCorrectAnswer.all"
+			class="pull-left div">
+		</div>
 		<div class="clearfix"></div>
-		<div ng-hide="!ctrl.isWrongAnswer" class="msg text-danger">{{'The correct answer is:'|translate}} {{ctrl.correctAnswer.answer}}</div>
-		<button type="submit" class="btn btn-success btn-lg" ng-disabled="answerForm.$invalid" ng-hide="ctrl.isWrongAnswer">{{ctrl.btnMessageCorrect}}</button> 
-		<button id="wrongnext" ng-click="ctrl.nextQuestion()" class="btn btn-success btn-lg" ng-hide="!ctrl.isWrongAnswer">{{ctrl.btnMessageIncorrect}}</button> 
+		<div ng-hide="ctrl.isCorrectAnswer.all" class="msg text-danger">{{'The correct answer is:'|translate}} {{ctrl.correctAnswer.answer}}
+			<span ng-hide="!ctrl.question.hasRemainder">, {{'Remainder'|translate}}: {{ctrl.correctAnswer.remainder}}</span>
+		</div>
+		<button type="submit" class="btn btn-success btn-lg" ng-disabled="answerForm.$invalid" ng-hide="!ctrl.isCorrectAnswer.all">{{ctrl.btnMessageCorrect}}</button> 
+		<button id="wrongnext" ng-click="ctrl.nextQuestion()" class="btn btn-success btn-lg" ng-hide="ctrl.isCorrectAnswer.all">{{ctrl.btnMessageIncorrect}}</button> 
 	</form>
 </div>

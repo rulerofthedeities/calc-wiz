@@ -11,11 +11,11 @@
 			fix-backspace
 			caret="0"
 			autocomplete="off" 
-			ng-class="{'red':ctrl.isWrongAnswer}" 
-			ng-disabled="ctrl.isWrongAnswer"
+			ng-class="{'red':!ctrl.isCorrectAnswer.answer}" 
+			ng-disabled="!ctrl.isCorrectAnswer.all"
 			required>
-		<div ng-hide="!ctrl.isWrongAnswer" class="msg text-danger">{{'The correct answer is:'|translate}} {{ctrl.correctAnswer.answer}}</div>
-		<button type="submit" class="btn btn-success btn-lg" ng-disabled="answerForm.$invalid" ng-hide="ctrl.isWrongAnswer">{{ctrl.btnMessageCorrect}}</button> 
-		<button id="wrongnext" ng-click="ctrl.nextQuestion()" class="btn btn-success btn-lg" ng-hide="!ctrl.isWrongAnswer">{{ctrl.btnMessageIncorrect}}</button> 
+		<div ng-hide="ctrl.isCorrectAnswer.all" class="msg text-danger">{{'The correct answer is:'|translate}} {{ctrl.correctAnswer.answer}}</div>
+		<button type="submit" class="btn btn-success btn-lg" ng-disabled="answerForm.$invalid" ng-hide="!ctrl.isCorrectAnswer.all">{{ctrl.btnMessageCorrect}}</button> 
+		<button id="wrongnext" ng-click="ctrl.nextQuestion()" class="btn btn-success btn-lg" ng-hide="ctrl.isCorrectAnswer.all">{{ctrl.btnMessageIncorrect}}</button> 
 	</form>
 </div>
