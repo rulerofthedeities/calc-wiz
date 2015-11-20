@@ -50,7 +50,9 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 })
 
 .factory("user", function(){
-	var user = {name:"anonymous"};
+	var defUser = {name:"anonymous"},
+		key = 'calc-wiz-user';
+		user = defUser;
 	return {
 		getUserName: function(){
 			return user.name;
@@ -61,10 +63,27 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		login: function(newUser){
 			user.name = newUser.name;
 			user.email = newUser.email;
+			this.save();
 		},
 		logout: function(){
-			user = {name:"anonymous"};
+			user = defUser;
 			return user.name;
+		},
+		load: function(){
+			var userData = localStorage.getItem(key);
+			userData = JSON.parse(userData);
+			if (userData){
+				user.name = userData.name;
+			} else {
+				user.name = defUser.name;
+			}
+			return user;
+		},
+		save: function(){
+			var toSave = {
+				'name': user.name
+			};
+			localStorage.setItem(key, JSON.stringify(toSave));
 		}
 	};
 })
@@ -281,11 +300,16 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	});
 })
 
-.service("results", function(){
+.service("results", function(user){
 	var results;
 
-	this.init = function(){
-		results = {questions:[]};
+	this.init = function(exercise){
+		results = {
+			questions:[],
+			tpe:exercise.tpe,
+			nrOfQuestions:exercise.nrOfQuestions,
+			timing: {started:exercise.started}
+		};
 	};
 
 	this.addResult = function(question, userAnswer, correctAnswer, correct, nr){
@@ -300,15 +324,15 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 
 	this._processResults = function(){
-		for(var indx = 0, countCorrect = 0; indx < this.results.questions.length; indx++){
-			if(this.results.questions[indx].correct.all) {
+		for(var indx = 0, countCorrect = 0; indx < results.questions.length; indx++){
+			if(results.questions[indx].correct.all) {
 				countCorrect++;
 			}
 		}
 		results.totals = {
-			nrOfQuestions: this.results.questions.length,
+			nrOfQuestions: results.questions.length,
 			correct: countCorrect,
-			percentage: countCorrect / this.results.questions.length * 100
+			percentage: countCorrect / results.questions.length * 100
 		};
 	};
 
@@ -320,17 +344,16 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 	this.endExercise = function(exercise){
 		var ended = exercise.ended || Date.now();
-		results.timing = {
-			started: exercise.started,
-			ended: ended,
-			elapse: ended - exercise.started
-		};
+
+		results.timing.ended = ended;
+		results.timing.elapse = ended - exercise.started;
+		results.user = {name: user.getUserName()};
+		this._processResults();
 		this._saveResults();
 	};
 
 	this.getResults = function(exercise){
 		this.endExercise(exercise);
-		this._processResults();
 		return results;
 	};
 })
@@ -423,7 +446,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		templateUrl: DEFAULTS.templateDir + 'header.htm',
 		controller: function($scope){
 			$scope.isHeaderCollapsed = true;
-			$scope.user = user.getUser();
+			$scope.user = user.load();
 		}
 	};
 })
@@ -586,7 +609,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			this.btnMessageCorrect = translate.translate(settings.btnMessage.active);
 			this.btnMessageIncorrect = translate.translate(settings.btnMessage.inActive);
 			
-			results.init();
+			results.init(calcExercise);
 			this.init();
 		}
 	};
