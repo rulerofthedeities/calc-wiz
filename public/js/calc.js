@@ -49,6 +49,18 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
+.factory("user", function(){
+	var user = {name:""};
+	return {
+		setUserName: function(name){
+			user.name = name;
+		},
+		getUserName: function(){
+			return user.name;
+		}
+	};
+})
+
 .factory("setFocus", function($timeout, $window){
 	return function(id) {
 		$timeout(function() {
@@ -230,7 +242,8 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 })
 
-.service("exercise", function(questions, settings){
+.service("exercise", function($rootScope, $log, questions, settings, results){
+	var exercise;
 
 	function Exercise(args){
 		this.tpe = args.tpe;
@@ -242,20 +255,28 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	}
 
 	this.createExercise = function(tpe){
-		var exercise = new Exercise({'tpe' : tpe}),
-			exQuestions = questions.getQuestions(tpe);
+		var exQuestions = questions.getQuestions(tpe);
 
+		exercise = new Exercise({'tpe' : tpe});
 		exercise.questions = exQuestions.questions;
 		exercise.answers = exQuestions.answers;
 		exercise.checkAnswer = questions.checkAnswer;
 		return exercise;
 	};
 
+	$rootScope.$on("$routeChangeSuccess", function (e, args) {
+		if (exercise) {
+			results.endExercise(exercise);
+			$log.warn("User unexpectedly stopped exercise");
+		}
+	});
 })
 
 .service("results", function(){
+	var results;
+
 	this.init = function(){
-		this.results = {questions:[]};
+		results = {questions:[]};
 	};
 
 	this.addResult = function(question, userAnswer, correctAnswer, correct, nr){
@@ -266,30 +287,42 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			correctAnswer: correctAnswer,
 			correct: correct
 		};
-		this.results.questions.push(result);
+		results.questions.push(result);
 	};
 
-	this._processResults = function(exercise){
+	this._processResults = function(){
 		for(var indx = 0, countCorrect = 0; indx < this.results.questions.length; indx++){
 			if(this.results.questions[indx].correct.all) {
 				countCorrect++;
 			}
 		}
-		this.results.totals = {
+		results.totals = {
 			nrOfQuestions: this.results.questions.length,
 			correct: countCorrect,
 			percentage: countCorrect / this.results.questions.length * 100
 		};
-		this.results.timing = {
+	};
+
+	this._saveResults = function(){
+		//Save to db
+		console.log("Saving results");
+		console.log(results);
+	};
+
+	this.endExercise = function(exercise){
+		var ended = exercise.ended || Date.now();
+		results.timing = {
 			started: exercise.started,
-			ended: exercise.ended,
-			elapse: exercise.ended - exercise.started
+			ended: ended,
+			elapse: ended - exercise.started
 		};
+		this._saveResults();
 	};
 
 	this.getResults = function(exercise){
-		this._processResults(exercise);
-		return this.results;
+		this.endExercise(exercise);
+		this._processResults();
+		return results;
 	};
 })
 
@@ -522,7 +555,6 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 				} else {
 					calcExercise.exerciseCompleted();
 					this.results = results.getResults(calcExercise);
-					console.log(this.results);
 					this.subview = "results";
 					if (this.results.totals.percentage == 100){
 						$scope.$emit('audio', {'sound':'cheer'});
