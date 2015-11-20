@@ -3,7 +3,7 @@ var gulp = require('gulp'),
 	ngdocs = require('gulp-ngdocs'),
 
 	config = {
-    	sassPath: 'assets/sass',
+    	sassPath: 'public/sass',
     	bowerDir: 'bower_components/'
 	},
 
@@ -20,18 +20,18 @@ var gulp = require('gulp'),
 gulp.task('vendor_scripts', function() {
 	return gulp.src(vendorJS)
 		.pipe(concat('vendor.js'))
-		.pipe(gulp.dest('assets/js'));
+		.pipe(gulp.dest('public/js'));
 });
 
 gulp.task('vendor_styles', function() {
 	return gulp.src(vendorCSS)
 		.pipe(concat('vendor.css'))
-		.pipe(gulp.dest('assets/css'));
+		.pipe(gulp.dest('public/css'));
 });
 
 gulp.task('vendor_fonts', function() {
 	return gulp.src(config.bowerDir + '/font-awesome/fonts/**.*')
-		.pipe(gulp.dest('assets/fonts'));
+		.pipe(gulp.dest('public/fonts'));
 });
 
 gulp.task('default', ['vendor_scripts', 'vendor_styles', 'vendor_fonts']);

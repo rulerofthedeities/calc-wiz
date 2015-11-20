@@ -62,23 +62,34 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 .service("config", function($http, $log, settings, configFileName){
 	this.saveConfigFile = function(){
+		/*
 		 var req = {
 			 method: 'POST',
-			 url: '/updateconfig',
+			 url: '/saveconfig',
 			 headers: {
 			   'Content-Type': "application/json"
 			 },
 			 data: settings
 			};
+
 		$http(req).then(function(response) {
-			$log.info("Saved config file");
+			$log.info("Saved configuration file");
 			return true;
 		}, function(){
-			$log.error("Error saving config file");
+			$log.error("Error saving configuration file");
 			return false;
 		});
+		*/
+		console.log(encodeURI(configFileName));
+		$http.post('saveconfig?file=' + encodeURI(configFileName), settings).then(function(){
+           console.log("saved");
+        });
 	};
+
 })
+
+
+
 
 .service("questions", function(settings, utils){
 	function Question(args){
@@ -594,13 +605,14 @@ angular.element(document).ready(function () {
 	var initInjector = angular.injector(['ng']),
 		$http = initInjector.get('$http'),
 		$log = initInjector.get('$log'),
-		configFileName = "json/config.json",
-		translateFileName = "json/translate.json",
-		promise = $http.get(configFileName);
+		jsonDir = "json/",
+		configFileName = "config.json",
+		translateFileName = "translate.json",
+		promise = $http.get(jsonDir + configFileName);
 
 	promise.then(
 		function(configResponse){
-			$log.info("Configuration file '" + configFileName + "' loaded");
+			$log.info("Configuration file '" + jsonDir + configFileName + "' loaded");
 
 			angular.module('kmCalc')
 				.value('settings', configResponse.data)
@@ -612,7 +624,7 @@ angular.element(document).ready(function () {
 				angular.bootstrap(document, ['kmCalc'], true);
 		},
 		function(){
-			$log.error("Error loading configuration file '" + configFileName + "'");
+			$log.error("Error loading configuration file '" + jsonDir + configFileName + "'");
 		}
 	);
 });
