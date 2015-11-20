@@ -56,7 +56,7 @@
                 "min": 11,
                 "max": 99
             },
-            "remainder": false
+            "remainder": true
         }
     },
     "operator": {

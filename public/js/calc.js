@@ -62,34 +62,16 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 .service("config", function($http, $log, settings, configFileName){
 	this.saveConfigFile = function(){
-		/*
-		 var req = {
-			 method: 'POST',
-			 url: '/saveconfig',
-			 headers: {
-			   'Content-Type': "application/json"
-			 },
-			 data: settings
-			};
-
-		$http(req).then(function(response) {
-			$log.info("Saved configuration file");
+		$http.post('saveconfig?file=' + encodeURI(configFileName), settings).then(function(){
+			$log.info("Saved file '" + configFileName + "'");
 			return true;
-		}, function(){
-			$log.error("Error saving configuration file");
+		},
+		function(){
+			$log.error("Error saving file '" + configFileName + "'");
 			return false;
 		});
-		*/
-		console.log(encodeURI(configFileName));
-		$http.post('saveconfig?file=' + encodeURI(configFileName), settings).then(function(){
-           console.log("saved");
-        });
 	};
-
 })
-
-
-
 
 .service("questions", function(settings, utils){
 	function Question(args){
@@ -254,8 +236,8 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		this.tpe = args.tpe;
 		this.nrOfQuestions = settings.general.nrOfQuestions;
 		this.started = Date.now();
-		this.ended = function(){
-			return Date.now();
+		this.exerciseCompleted = function(){
+			this.ended = Date.now();
 		};
 	}
 
@@ -287,7 +269,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		this.results.questions.push(result);
 	};
 
-	this._processResults = function(){
+	this._processResults = function(exercise){
 		for(var indx = 0, countCorrect = 0; indx < this.results.questions.length; indx++){
 			if(this.results.questions[indx].correct.all) {
 				countCorrect++;
@@ -298,10 +280,15 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			correct: countCorrect,
 			percentage: countCorrect / this.results.questions.length * 100
 		};
+		this.results.timing = {
+			started: exercise.started,
+			ended: exercise.ended,
+			elapse: exercise.ended - exercise.started
+		};
 	};
 
-	this.getResults = function(){
-		this._processResults();
+	this.getResults = function(exercise){
+		this._processResults(exercise);
 		return this.results;
 	};
 })
@@ -496,19 +483,24 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
     	controllerAs: 'ctrl',
 		controller: function($scope, exercise, settings, results){
 			var calcExercise = exercise.createExercise(this.type),
-				correctAnswer;
+				correctAnswer,
+				startTime;
 
 			this.init = function(){
 				this.question = calcExercise.questions[this.nr - 1];
 				correctAnswer = calcExercise.answers[this.nr - 1];
+				startTime = Date.now();
 				this.isCorrectAnswer = {'answer': true, 'remainder': true, 'all': true};
 				this.setFocus = true;
 			};
 
 			this.submitAnswer = function(){
-				var answer = {'answer': this.question.userAnswer, 'remainder': this.question.remainder},
+				var answer = {
+						'answer': this.question.userAnswer, 
+						'remainder': this.question.remainder,
+						'elapseTime' : Date.now() - startTime
+					},
 					correct = calcExercise.checkAnswer()(answer, correctAnswer);
-
 				results.addResult(this.question, answer, correctAnswer, correct, this.nr);
 				this.correct[this.nr - 1] = correct.all;
 
@@ -528,8 +520,9 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 					this.nr++;
 					this.init();
 				} else {
-					calcExercise.ended();
-					this.results = results.getResults();
+					calcExercise.exerciseCompleted();
+					this.results = results.getResults(calcExercise);
+					console.log(this.results);
 					this.subview = "results";
 					if (this.results.totals.percentage == 100){
 						$scope.$emit('audio', {'sound':'cheer'});
