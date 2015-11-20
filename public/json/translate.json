@@ -2,7 +2,6 @@
 	"nl": {
 		"Configuration": "Configuratie",
 		"Results": "Resultaten",
-		"Login": "Aanmelden",
 		"General": "Algemeen",
 
 		"Arithmetic": "Rekenen",
@@ -34,6 +33,9 @@
 
 		"Password": "Paswoord",
 		"Email": "Email",
-		"Remember me": "Onthou mij"
+		"Name": "Naam",
+		"Remember me": "Onthou mij",
+		"Login": "Aanmelden",
+		"Logout": "Afmelden"
 	}
 }

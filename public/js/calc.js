@@ -50,12 +50,20 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 })
 
 .factory("user", function(){
-	var user = {name:""};
+	var user = {name:"anonymous"};
 	return {
-		setUserName: function(name){
-			user.name = name;
-		},
 		getUserName: function(){
+			return user.name;
+		},
+		getUser: function(){
+			return user;
+		},
+		login: function(newUser){
+			user.name = newUser.name;
+			user.email = newUser.email;
+		},
+		logout: function(){
+			user = {name:"anonymous"};
 			return user.name;
 		}
 	};
@@ -242,12 +250,13 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 })
 
-.service("exercise", function($rootScope, $log, questions, settings, results){
+.service("exercise", function($rootScope, $log, questions, settings, results, user){
 	var exercise;
 
 	function Exercise(args){
 		this.tpe = args.tpe;
 		this.nrOfQuestions = settings.general.nrOfQuestions;
+		this.user = user;
 		this.started = Date.now();
 		this.exerciseCompleted = function(){
 			this.ended = Date.now();
@@ -332,10 +341,10 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 })
 
 
-.controller("loginCtrl", function($scope, $uibModal, $log){
+.controller("loginCtrl", function($scope, $uibModal, $log, user){
 
 	var data = {};
-	data.email = "test@yahoo.com";
+	//data.email = "test@yahoo.com";
 
 	$scope.openModal = function (size) {
 		var modalInstance = $uibModal.open({
@@ -352,11 +361,17 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		});
 		modalInstance.result.then(function (loginData) {
 	     	$log.info(loginData);
+	     	if (loginData.name){
+	     		user.login(loginData);
+	     	}
 	    }, function () {
 	    	//Modal closed
 	    });
   	};
 
+  	$scope.logOut = function(){
+  		$scope.user.name = user.logout();
+  	};
 })
 
 .controller('modalLoginCtrl', function ($scope, $uibModalInstance, translate, data) {
@@ -400,7 +415,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
-.directive("calcHeader", function(DEFAULTS){
+.directive("calcHeader", function(DEFAULTS, user){
 	return{
 		restrict: 'E',
 		replace: true,
@@ -408,6 +423,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		templateUrl: DEFAULTS.templateDir + 'header.htm',
 		controller: function($scope){
 			$scope.isHeaderCollapsed = true;
+			$scope.user = user.getUser();
 		}
 	};
 })

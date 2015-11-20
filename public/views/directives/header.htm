@@ -9,13 +9,24 @@
         </button>
 		<span class="navbar-brand">{{title}}</span>
 	</div>
+
 	<nav uib-collapse="isHeaderCollapsed">
 		<ul class="nav navbar-nav">
 			<li><a href="#/results"><i class="fa fa-file-o"></i> <span translate="content">Results</span></a></li>
 			<li><a href="#/config"><i class="fa fa-wrench"></i> <span translate="content">Configuration</span></a></li>
 		</ul>
-		<ul class="nav navbar-nav navbar-right">
-			<li><a ng-click="openModal()" ng-controller="loginCtrl"><i class="fa fa-unlock"></i> <span translate="content">Login</span></a></li>
+	</nav>
+
+	<nav uib-collapse="isHeaderCollapsed" class="navbar-right">
+		<ul class="nav navbar-nav" ng-controller="loginCtrl">
+			<li ng-if="user.name!=='anonymous'"><a href="#" ng-click='$event.preventDefault()'>{{user.name}}</a></li>
+			<li ng-if="user.name==='anonymous'">
+				<a ng-click="openModal()"><i class="fa fa-unlock"></i> <span translate="content">Login</span></a>
+			</li>
+			<li ng-if="user.name!=='anonymous'">
+				<a ng-click="logOut()"><i class="fa fa-unlock"></i> <span translate="content">Logout</span></a>
+			</li>
 		</ul>
 	</nav>
+
 </header>
