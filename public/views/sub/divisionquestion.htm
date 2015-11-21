@@ -8,13 +8,13 @@
 			<input 
 				type="text" 
 				class="helper" 
-				ng-repeat="field in ctrl.question.helpFields" 
+				ng-repeat="field in ctrl.question.helpers.helpFields" 
 				ng-class="[field.offset, field.width]">
 		</div>
 		<label class="sr-only" for="answer" translate="content">Answer</label>
 		<input 
 			name="answer" 
-			ng-model="ctrl.question.userAnswer" 
+			ng-model="ctrl.userAnswer" 
 			auto-focus 
 			autocomplete="off" 
 			ng-class="{'red':!ctrl.isCorrectAnswer.answer}" 

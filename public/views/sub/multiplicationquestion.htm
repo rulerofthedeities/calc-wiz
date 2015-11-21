@@ -6,7 +6,7 @@
 			<input 
 				type="text" 
 				class="helper" 
-				ng-repeat="field in ctrl.question.helpFields" 
+				ng-repeat="field in ctrl.question.helpers.helpFields" 
 				fix-backspace
 				caret="0"
 				ng-model="field.value"
@@ -16,7 +16,7 @@
 		<label class="sr-only" for="answer">Answer</label>
 		<input 
 			name="answer" 
-			ng-model="ctrl.question.userAnswer" 
+			ng-model="ctrl.userAnswer" 
 			setfocus="ctrl.setFocus" 
 			auto-focus 
 			fix-backspace
@@ -25,7 +25,7 @@
 			autocomplete="off" 
 			ng-class="{'red':!ctrl.isCorrectAnswer.answer}" 
 			ng-disabled="!ctrl.isCorrectAnswer.all"
-			ng-style="{width:(ctrl.question.ansLen * 46) + 'px'}"
+			ng-style="{width:(ctrl.question.helpers.ansLen * 46) + 'px'}"
 			required>
 		<div ng-hide="!ctrl.isWrongAnswer" class="msg text-danger">{{'The correct answer is:'|translate}} {{ctrl.correctAnswer.answer}}</div>
 		<button type="submit" class="btn btn-success btn-lg" ng-disabled="answerForm.$invalid" ng-hide="!ctrl.isCorrectAnswer.all">{{ctrl.btnMessageCorrect}}</button> 

@@ -118,7 +118,6 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		this.tpe = args.tpe;
 		this.operator = settings.operator[args.tpe].label;
 		this.hasRemainder = settings.range.division.remainder;
-		this.userAnswer = null;
 	}
 
 	this._getTerms = function(tpe){
@@ -228,14 +227,14 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			termLen = this._getLen(terms, tpe),
 			answer;
 
-		question.helpFields = this._getHelpFields(terms, tpe);
+		question.helpers = {};
+		question.helpers.helpFields = this._getHelpFields(terms, tpe);
 		terms = {
 			1: utils.pad(terms.term1, " ", termLen), 
 			2: tpe !== "division" ? utils.pad(terms.term2, " ", termLen) : terms.term2.toString()
 		};
 		answer = this.getAnswer(terms, tpe);
-		question.termLen = termLen;
-		question.answLen = answer.answer.toString().length;
+		question.helpers.answLen = answer.answer.toString().length;
 		question.terms = terms;
 
 		return {'question': question, 'answer': answer};
@@ -270,12 +269,11 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 })
 
-.service("exercise", function($rootScope, $log, questions, settings, results, user){
+.service("exercise", function($rootScope, $log, questions, results, user){
 	var exercise;
 
 	function Exercise(args){
 		this.tpe = args.tpe;
-		this.nrOfQuestions = settings.general.nrOfQuestions;
 		this.user = user;
 		this.started = Date.now();
 		this.interrupted = false;
@@ -321,17 +319,17 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 	this.addResult = function(newResult){
 		var result = angular.copy(newResult);
-		delete result.question.answLen;
-		delete result.question.termLen;
+
+		console.log(newResult);
+
 		delete result.question.helpFields;
-		delete result.question.userAnswer;
 
 		results.questions.push(result);
 	};
 
 	this._processResults = function(){
 		for(var indx = 0, countCorrect = 0; indx < results.questions.length; indx++){
-			if(results.questions[indx].correct.all) {
+			if(results.questions[indx].answer.correct.all) {
 				countCorrect++;
 			}
 		}
@@ -574,6 +572,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 			this.init = function(){
 				this.question = calcExercise.questions[this.nr - 1];
+				this.userAnswer = "";
 				correctAnswer = calcExercise.answers[this.nr - 1];
 				startTime = Date.now();
 				this.isCorrectAnswer = {'answer': true, 'remainder': true, 'all': true};
@@ -582,17 +581,19 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 			this.submitAnswer = function(){
 				var answer = {
-						'answer': this.question.userAnswer, 
+						'answer': this.userAnswer, 
 						'remainder': this.question.remainder,
 						'elapseTime' : Date.now() - startTime
 					},
 					correct = calcExercise.checkAnswer()(answer, correctAnswer);
 				results.addResult({
+					nr: this.nr,
 					question: this.question, 
-					userAnswer: answer, 
-					correctAnswer: correctAnswer, 
-					correct: correct, 
-					nr: this.nr
+					answer: {
+						userAnswer: answer, 
+						correctAnswer: correctAnswer, 
+						correct: correct
+					}
 				});
 				this.correct[this.nr - 1] = correct.all;
 
