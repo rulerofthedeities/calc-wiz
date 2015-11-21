@@ -51,8 +51,9 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 .factory("user", function(){
 	var defUser = {name:"anonymous"},
-		key = 'calc-wiz-user';
+		key = 'calc-wiz-user',
 		user = defUser;
+		
 	return {
 		getUserName: function(){
 			return user.name;
@@ -101,7 +102,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 .service("config", function($http, $log, settings, configFileName){
 	this.saveConfigFile = function(){
-		$http.post('saveconfig?file=' + encodeURI(configFileName), settings).then(function(){
+		$http.post('/config?file=' + encodeURI(configFileName), settings).then(function(){
 			$log.info("Saved file '" + configFileName + "'");
 			return true;
 		},
@@ -277,6 +278,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		this.nrOfQuestions = settings.general.nrOfQuestions;
 		this.user = user;
 		this.started = Date.now();
+		this.interrupted = false;
 		this.exerciseCompleted = function(){
 			this.ended = Date.now();
 		};
@@ -293,14 +295,15 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 
 	$rootScope.$on("$routeChangeSuccess", function (e, args) {
-		if (exercise) {
+		if (exercise && results.getNrOfResultsDone() > 0) {
+			exercise.interrupted = true;
 			results.endExercise(exercise);
 			$log.warn("User unexpectedly stopped exercise");
 		}
 	});
 })
 
-.service("results", function(user){
+.service("results", function($http, $log, user){
 	var results;
 
 	this.init = function(exercise){
@@ -312,14 +315,17 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		};
 	};
 
-	this.addResult = function(question, userAnswer, correctAnswer, correct, nr){
-		var result = {
-			nr: nr + 1,
-			question: question, 
-			userAnswer: userAnswer,
-			correctAnswer: correctAnswer,
-			correct: correct
-		};
+	this.getNrOfResultsDone = function(){
+		return results.questions.length;
+	};
+
+	this.addResult = function(newResult){
+		var result = angular.copy(newResult);
+		delete result.question.answLen;
+		delete result.question.termLen;
+		delete result.question.helpFields;
+		delete result.question.userAnswer;
+
 		results.questions.push(result);
 	};
 
@@ -338,8 +344,15 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 	this._saveResults = function(){
 		//Save to db
-		console.log("Saving results");
-		console.log(results);
+		$http.post('/results', results).then(
+			function(){
+				$log.info("Saved results to database.");
+				return true;
+			},
+			function(){
+				$log.error("Error saving results to database");
+				return false;
+		});
 	};
 
 	this.endExercise = function(exercise){
@@ -347,6 +360,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 		results.timing.ended = ended;
 		results.timing.elapse = ended - exercise.started;
+		results.timing.interrupted = exercise.interrupted;
 		results.user = {name: user.getUserName()};
 		this._processResults();
 		this._saveResults();
@@ -573,7 +587,13 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 						'elapseTime' : Date.now() - startTime
 					},
 					correct = calcExercise.checkAnswer()(answer, correctAnswer);
-				results.addResult(this.question, answer, correctAnswer, correct, this.nr);
+				results.addResult({
+					question: this.question, 
+					userAnswer: answer, 
+					correctAnswer: correctAnswer, 
+					correct: correct, 
+					nr: this.nr
+				});
 				this.correct[this.nr - 1] = correct.all;
 
 				if (correct.all){
