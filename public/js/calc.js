@@ -392,6 +392,19 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
+.filter('msToTime', function () {
+	return function (input) {
+		var sec = parseInt(input / 1000, 10);
+		if (isNaN(sec)) return "00:00:00";
+
+		var hours = Math.floor(sec / 3600),
+			minutes = Math.floor((sec - (hours * 3600)) / 60),
+			seconds = sec - (hours * 3600) - (minutes * 60);
+
+		return [("0" + hours).substr(-2), ("0" + minutes).substr(-2), ("0" + seconds).substr(-2)].join(":");
+	};
+})
+
 .controller("exercisesCtrl", function($scope, $routeParams, utils){
 	$scope.type = $routeParams.type;
 	$scope.title = utils.capitalizeFirstLetter($routeParams.type);
@@ -442,8 +455,17 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
-.controller('resultsCtrl', function($scope, results){
+.controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter){
 	var resultsArr = results.fetchAllResults(function(resultsArr){
+		//format in controller since filters are slow in repeats
+		angular.forEach(resultsArr, function(result){
+			result.tpe = utils.capitalizeFirstLetter(result.tpe);
+			result.timing.elapse = msToTimeFilter(result.timing.elapse);
+			result.timing.started = $filter('date')(result.timing.started, "dd/MM/yy HH:mm");
+			result.totals.correct = result.totals.correct + '/' + result.totals.nrOfQuestions;
+			result.totals.percentage = Math.round(result.totals.percentage);
+			result.perfect = result.totals.percentage == 100;
+		});
 		$scope.resultsTable = resultsArr;
 	});
 })
