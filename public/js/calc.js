@@ -29,6 +29,8 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	}).when('/exercises/:type', {
 		templateUrl: 'views/exercises.htm',
 		controller:'exercisesCtrl'
+	}).when('/results', {
+		templateUrl: 'views/results.htm'
 	}).when('/config', {
 		templateUrl: 'views/configuration.htm'
 	}).otherwise({redirectTo: '/'});
@@ -45,6 +47,15 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		},
 		capitalizeFirstLetter: function(str){
 			return str.charAt(0).toUpperCase() + str.slice(1);
+		},
+		objToParams: function(obj) {
+			var parms = [];
+			for (var p in obj) {
+				if (obj.hasOwnProperty(p)) {
+					parms.push(encodeURIComponent(p) + "=" + encodeURIComponent(obj[p]));
+				}
+			}
+			return parms.join("&");
 		}
 	};
 })
@@ -274,7 +285,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 	function Exercise(args){
 		this.tpe = args.tpe;
-		this.user = user;
+		this.user = user.getUser();
 		this.started = Date.now();
 		this.interrupted = false;
 		this.exerciseCompleted = function(){
@@ -293,7 +304,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 
 	$rootScope.$on("$routeChangeSuccess", function (e, args) {
-		if (exercise && results.getNrOfResultsDone() > 0) {
+		if (exercise && !exercise.finished && results.getNrOfResultsDone() > 0) {
 			exercise.interrupted = true;
 			results.endExercise(exercise);
 			$log.warn("User unexpectedly stopped exercise");
@@ -301,7 +312,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	});
 })
 
-.service("results", function($http, $log, user){
+.service("results", function($http, $log, user, utils){
 	var results;
 
 	this.init = function(exercise){
@@ -319,8 +330,6 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 	this.addResult = function(newResult){
 		var result = angular.copy(newResult);
-
-		console.log(newResult);
 
 		delete result.question.helpFields;
 
@@ -355,6 +364,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 	this.endExercise = function(exercise){
 		var ended = exercise.ended || Date.now();
+		exercise.finished = true;
 
 		results.timing.ended = ended;
 		results.timing.elapse = ended - exercise.started;
@@ -368,13 +378,24 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		this.endExercise(exercise);
 		return results;
 	};
+
+
+	this.fetchAllResults = function(callback){
+		var filters = {user:user.getUserName()},
+			filteredResults = null,
+			params = utils.objToParams(filters);
+
+		$http.get('/results?' + params).then(function(response){
+			callback(response.data);
+		});
+
+	};
 })
 
 .controller("exercisesCtrl", function($scope, $routeParams, utils){
 	$scope.type = $routeParams.type;
 	$scope.title = utils.capitalizeFirstLetter($routeParams.type);
 })
-
 
 .controller("loginCtrl", function($scope, $uibModal, $log, user){
 
@@ -419,6 +440,12 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	$scope.cancel = function () {
 		$uibModalInstance.dismiss('cancel');
 	};
+})
+
+.controller('resultsCtrl', function($scope, results){
+	var resultsArr = results.fetchAllResults(function(resultsArr){
+		$scope.resultsTable = resultsArr;
+	});
 })
 
 .directive("calcAudio", function(DEFAULTS, settings){

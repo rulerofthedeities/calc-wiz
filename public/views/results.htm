@@ -1,0 +1,28 @@
+<calc-header title="Results"></calc-header>
+<div ng-controller="resultsCtrl">
+<table class="table table-bordered table-striped">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Type</th>
+			<th>Start</th>
+			<th>Questions</th>
+			<th>correct</th>
+			<th>Percentage</th>
+			<th>Elapse time</th>
+			<th>Completed</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr ng-repeat="result in resultsTable track by $index">
+			<td>{{$index + 1}}</td>
+			<td>{{result.tpe}}</td>
+			<td>{{result.timing.started}}</td>
+			<td>{{result.totals.nrOfQuestions}}</td>
+			<td>{{result.totals.correct}}</td>
+			<td>{{result.totals.percentage}}%</td>
+			<td>{{result.timing.elapse}}</td>
+			<td>{{!result.timing.interrupted}}</td>
+		</tr>
+    </tbody>
+</div>
