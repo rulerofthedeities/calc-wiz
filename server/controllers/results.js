@@ -1,16 +1,14 @@
 var mongoClient = require('mongodb').MongoClient,
 	assert = require("assert");
 
-var findResultDocs = function(db, callback) {
+var findResultDocs = function(db, filter, callback) {
 	var docs = [],
-		filter = {},
 		fields = {
 			tpe:true,
 			totals:true,
 			timing:true,
 		},
 		cursor = db.collection('results').find(filter, fields);
-
 	cursor.each(function(err, doc) {
 		assert.equal(err, null);
 		if (doc !== null) {
@@ -44,13 +42,18 @@ module.exports = {
 		});
 	},
 	retrieve: function(req, res){
-		var query = req.query;
+		var query = req.query,
+			filter = {};
 		console.log(query);
+		
+		if (query.completed == 'true'){
+			filter["timing.interrupted"] = false;
+		}
 
 		mongoClient.connect('mongodb://localhost:27017/calcwiz', function(err, db) {
 			assert.equal(null, err);
 
-			findResultDocs(db, function(docs) {
+			findResultDocs(db, filter, function(docs) {
 				res.status(200).send(docs);
 				db.close();
 			});

@@ -1,15 +1,21 @@
 <calc-header title="Results"></calc-header>
 <div ng-controller="resultsCtrl">
+<form name="filterForm">
+	<label>
+		<input type="checkbox" ng-model="filter.completed" ng-change="updateFilter()">
+		{{filterLabels.completed}}
+	</label>
+</form>
 <table class="table table-bordered table-striped table-hover table-condensed">
 	<thead>
 		<tr>
 			<th>#</th>
-			<th>Type</th>
-			<th>Start</th>
-			<th>Correct</th>
-			<th>Percentage</th>
-			<th>Elapse time</th>
-			<th>Completed</th>
+			<th>{{tableHeaders.tpe}}</th>
+			<th>{{tableHeaders.start}}</th>
+			<th>{{tableHeaders.correct}}</th>
+			<th>{{tableHeaders.perc}}</th>
+			<th>{{tableHeaders.time}}</th>
+			<th>{{tableHeaders.completed}}</th>
 		</tr>
 	</thead>
 	<tbody>
@@ -20,7 +26,7 @@
 			<td class="text-center">{{result.totals.correct}}</td>
 			<td class="text-center" ng-class="{'success':result.perfect}">{{result.totals.percentage}}%</td>
 			<td class="text-center">{{result.timing.elapse}}</td>
-			<td class="text-center">{{!result.timing.interrupted}}</td>
+			<td class="text-center">{{result.timing.completed}}</td>
 		</tr>
     </tbody>
 </div>

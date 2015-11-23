@@ -154,6 +154,14 @@ input[name=remainder]{border-color:blue;}
 }
 
 /************/
+/* results  */
+/************/
+
+table th{
+	text-align: center;
+}
+
+/************/
 /* result   */
 /************/
 

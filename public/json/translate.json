@@ -31,6 +31,16 @@
 		"The correct answer is:": "Het juiste antwoord is:",
 		"Result": "Resultaat",
 
+		"Yes": "Ja",
+		"No": "Nee",
+		"Completed only": "Enkel voltooid",
+		"Type": "Soort",
+		"Start": "Start",
+		"Correct": "Correct",
+		"Percentage": "Percentage",
+		"Elapse Time": "Verstreken tijd",
+		"Completed": "Voltooid",
+
 		"Password": "Paswoord",
 		"Email": "Email",
 		"Name": "Naam",

@@ -379,12 +379,12 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		return results;
 	};
 
-
-	this.fetchAllResults = function(callback){
-		var filters = {user:user.getUserName()},
+	this.fetchAllResults = function(filter, callback){
+		var filters = filter,
 			filteredResults = null,
 			params = utils.objToParams(filters);
-
+		//filters.user = user.getUserName();
+		console.log(filters);
 		$http.get('/results?' + params).then(function(response){
 			callback(response.data);
 		});
@@ -455,19 +455,45 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
-.controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter){
-	var resultsArr = results.fetchAllResults(function(resultsArr){
-		//format in controller since filters are slow in repeats
-		angular.forEach(resultsArr, function(result){
-			result.tpe = utils.capitalizeFirstLetter(result.tpe);
-			result.timing.elapse = msToTimeFilter(result.timing.elapse);
-			result.timing.started = $filter('date')(result.timing.started, "dd/MM/yy HH:mm");
-			result.totals.correct = result.totals.correct + '/' + result.totals.nrOfQuestions;
-			result.totals.percentage = Math.round(result.totals.percentage);
-			result.perfect = result.totals.percentage == 100;
+.controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter, translate){
+
+	this.getResultsTable = function(){
+		results.fetchAllResults($scope.filter, function(resultsArr){
+			//format in controller since filters are slow in repeats
+			angular.forEach(resultsArr, function(result){
+				result.tpe = translate.translate(utils.capitalizeFirstLetter(result.tpe));
+				result.timing.elapse = msToTimeFilter(result.timing.elapse);
+				result.timing.started = $filter('date')(result.timing.started, "dd/MM/yy HH:mm");
+				result.timing.completed = result.timing.interrupted ? translate.translate("No") : translate.translate("Yes");
+				result.totals.correct = result.totals.correct + '/' + result.totals.nrOfQuestions;
+				result.totals.percentage = Math.round(result.totals.percentage);
+				result.perfect = result.totals.percentage == 100;
+			});
+			$scope.resultsTable = resultsArr;
 		});
-		$scope.resultsTable = resultsArr;
-	});
+	};
+
+	var self = this;
+	$scope.updateFilter = function(){
+		console.log($scope.filter);
+		self.getResultsTable();
+	};
+
+	//initialize filter
+	$scope.filter = {completed:true};
+	$scope.filterLabels = {
+		completed: translate.translate("Completed only")
+	},
+	$scope.tableHeaders = {
+		tpe: translate.translate("Type"),
+		start:translate.translate("Start"),
+		correct: translate.translate("Correct"),
+		perc: translate.translate("Percentage"),
+		time: translate.translate("Elapse Time"),
+		completed: translate.translate("Completed")
+	};
+
+	this.getResultsTable();
 })
 
 .directive("calcAudio", function(DEFAULTS, settings){
