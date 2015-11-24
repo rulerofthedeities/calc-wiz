@@ -1,0 +1,25 @@
+<p class="input-group">
+	<span class="input-group-addon">
+	<label for="date">{{labels.main}}</label></span>
+	<input type="text" 
+		name="date"
+		class="form-control" 
+		uib-datepicker-popup="{{format}}" 
+		ng-model="dt" 
+		is-open="status.opened" 
+		max-date="maxDate" 
+		datepicker-options="dateOptions" 
+		date-disabled="disabled(date, mode)" 
+		ng-required="true" 
+		close-text="{{labels.close}}"
+		current-text="{{labels.today}}"
+		clear-text="{{labels.clear}}" />
+	<span class="input-group-btn">
+		<button 
+			type="button" 
+			class="btn btn-default" 
+			ng-click="open($event)">
+			<i class="glyphicon glyphicon-calendar"></i>
+		</button>
+	</span>
+</p>

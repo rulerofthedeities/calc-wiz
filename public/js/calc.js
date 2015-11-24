@@ -384,7 +384,6 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			filteredResults = null,
 			params = utils.objToParams(filters);
 		//filters.user = user.getUserName();
-		console.log(filters);
 		$http.get('/results?' + params).then(function(response){
 			callback(response.data);
 		});
@@ -455,6 +454,55 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
+.directive("datePicker", function(DEFAULTS, translate){
+	return{
+		restrict:'E',
+		templateUrl: DEFAULTS.templateDir + 'datepicker.htm',
+		controller: 
+		function ($scope, $filter) {
+			$scope.labels = {
+				main: translate.translate("Date"),
+				close: translate.translate("Close"),
+				today: translate.translate("Today"),
+				clear: translate.translate("Clear")
+			};
+			
+			$scope.today = function() {
+				$scope.dt = new Date();
+			};
+
+			$scope.clear = function () {
+				$scope.dt = null;
+			};
+			$scope.clear();
+
+			$scope.maxDate = new Date();
+
+			$scope.open = function($event) {
+				$scope.status.opened = true;
+			};
+
+			$scope.dateOptions = {
+				formatYear: 'yy',
+				startingDay: 1
+			};
+
+			$scope.formats = ['dd/MM/yy'];
+			$scope.format = $scope.formats[0];
+
+			$scope.status = {
+				opened: false
+			};
+
+		    $scope.$watch('dt', function(newDt, oldDt) {
+				if (oldDt !== newDt){
+					$scope.filterDt = $filter('date')(newDt, "dd/MM/yy");
+				}
+			});
+		}
+	};
+})
+
 .controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter, translate){
 
 	this.getResultsTable = function(){
@@ -463,7 +511,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			angular.forEach(resultsArr, function(result){
 				result.tpe = translate.translate(utils.capitalizeFirstLetter(result.tpe));
 				result.timing.elapse = msToTimeFilter(result.timing.elapse);
-				result.timing.started = $filter('date')(result.timing.started, "dd/MM/yy HH:mm");
+				result.started = $filter('date')(result.timing.started, "dd/MM/yy HH:mm");
 				result.timing.completed = result.timing.interrupted ? translate.translate("No") : translate.translate("Yes");
 				result.totals.correct = result.totals.correct + '/' + result.totals.nrOfQuestions;
 				result.totals.percentage = Math.round(result.totals.percentage);
@@ -475,15 +523,24 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 
 	var self = this;
 	$scope.updateFilter = function(){
-		console.log($scope.filter);
 		self.getResultsTable();
 	};
 
 	//initialize filter
-	$scope.filter = {completed:true};
+	$scope.filter = {
+		completed: true,
+		tpes: [
+			{val: "", name: translate.translate("All Exercises")},
+			{val: translate.translate("Addition")},
+			{val: translate.translate("Subtraction")},
+			{val: translate.translate("Multiplication")},
+			{val: translate.translate("Division")}]
+	};
 	$scope.filterLabels = {
-		completed: translate.translate("Completed only")
-	},
+		completed: translate.translate("Completed only"),
+		type: translate.translate("Type"),
+		date: translate.translate("Date")
+	};
 	$scope.tableHeaders = {
 		tpe: translate.translate("Type"),
 		start:translate.translate("Start"),

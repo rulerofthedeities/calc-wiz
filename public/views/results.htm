@@ -1,32 +1,52 @@
 <calc-header title="Results"></calc-header>
 <div ng-controller="resultsCtrl">
-<form name="filterForm">
-	<label>
-		<input type="checkbox" ng-model="filter.completed" ng-change="updateFilter()">
-		{{filterLabels.completed}}
-	</label>
-</form>
-<table class="table table-bordered table-striped table-hover table-condensed">
-	<thead>
-		<tr>
-			<th>#</th>
-			<th>{{tableHeaders.tpe}}</th>
-			<th>{{tableHeaders.start}}</th>
-			<th>{{tableHeaders.correct}}</th>
-			<th>{{tableHeaders.perc}}</th>
-			<th>{{tableHeaders.time}}</th>
-			<th>{{tableHeaders.completed}}</th>
-		</tr>
-	</thead>
-	<tbody>
-		<tr ng-repeat="result in resultsTable track by $index" ng-class="{'danger':result.timing.interrupted}">
-			<td class="text-right">{{$index + 1}}.</td>
-			<td>{{result.tpe}}</td>
-			<td class="text-center">{{result.timing.started}}</td>
-			<td class="text-center">{{result.totals.correct}}</td>
-			<td class="text-center" ng-class="{'success':result.perfect}">{{result.totals.percentage}}%</td>
-			<td class="text-center">{{result.timing.elapse}}</td>
-			<td class="text-center">{{result.timing.completed}}</td>
-		</tr>
-    </tbody>
+	<form name="filterForm" class="row">
+	    <div class="col-xs-4">
+			<date-picker label="{{filterLabels.date}}"></date-picker>
+		</div>
+	    <div class="col-xs-4">
+	    	<p class="input-group">
+	    		<span class="input-group-addon">
+					<label for="tpes">{{filterLabels.type}}:</label>
+				</span>
+				<select name="tpes" class="form-control" ng-model="search.tpe">
+					<option ng-repeat="tpe in filter.tpes" value="{{tpe.val}}">
+						{{tpe.val||tpe.name}}
+					</option>
+				</select>
+			</p>
+		</div>
+	    <div class="col-xs-4">
+            <p class = "input-group">
+               	<span class = "input-group-addon">
+					<input type="checkbox" ng-model="filter.completed" ng-change="updateFilter()">
+				</span>
+				<input type="text" disabled="disabled" style="background-color:white" class="form-control" value="{{filterLabels.completed}}">
+			</p>
+		</div>
+	</form>
+	<table class="table table-bordered table-striped table-hover table-condensed">
+		<thead>
+			<tr>
+				<th>#</th>
+				<th>{{tableHeaders.tpe}}</th>
+				<th>{{tableHeaders.start}}</th>
+				<th>{{tableHeaders.correct}}</th>
+				<th>{{tableHeaders.perc}}</th>
+				<th>{{tableHeaders.time}}</th>
+				<th>{{tableHeaders.completed}}</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="result in resultsTable | filter:{tpe: search.tpe, started: filterDt}" ng-class="{'danger':result.timing.interrupted}">
+				<td class="text-right">{{$index + 1}}.</td>
+				<td>{{result.tpe}}</td>
+				<td class="text-center">{{result.started}}</td>
+				<td class="text-center">{{result.totals.correct}}</td>
+				<td class="text-center" ng-class="{'success':result.perfect}">{{result.totals.percentage}}%</td>
+				<td class="text-center">{{result.timing.elapse}}</td>
+				<td class="text-center">{{result.timing.completed}}</td>
+			</tr>
+		</tbody>
+    </table>
 </div>
