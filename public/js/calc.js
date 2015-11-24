@@ -63,7 +63,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 .factory("user", function(){
 	var defUser = {name:"anonymous"},
 		key = 'calc-wiz-user',
-		user = defUser;
+		user = angular.copy(defUser);
 		
 	return {
 		getUserName: function(){
@@ -76,9 +76,11 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			user.name = newUser.name;
 			user.email = newUser.email;
 			this.save();
+			$scope.$broadcast('user', {'name':newUser.name});
 		},
 		logout: function(){
 			user = defUser;
+			$scope.$broadcast('user', {'name':user.name});
 			return user.name;
 		},
 		load: function(){
@@ -503,10 +505,14 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
-.controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter, translate){
+.controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter, user, translate){
 
 	this.getResultsTable = function(){
-		results.fetchAllResults($scope.filter, function(resultsArr){
+		var serverFilter = {
+			'user':user.getUserName(),
+			'completed':$scope.filter.completed
+		};
+		results.fetchAllResults(serverFilter, function(resultsArr){
 			//format in controller since filters are slow in repeats
 			angular.forEach(resultsArr, function(result){
 				result.tpe = translate.translate(utils.capitalizeFirstLetter(result.tpe));
@@ -526,6 +532,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		self.getResultsTable();
 	};
 
+	$scope.user = user.getUserName();
 	//initialize filter
 	$scope.filter = {
 		completed: true,
@@ -550,7 +557,14 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		completed: translate.translate("Completed")
 	};
 
+	$scope.$on('user', function(event, args) {
+		console.log("user updated");
+		$scope.user = args.name;
+		self.getResultsTable();
+	});
+
 	this.getResultsTable();
+
 })
 
 .directive("calcAudio", function(DEFAULTS, settings){
@@ -625,7 +639,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			
 		},
 		link: function(scope, element, attr) {
-        	scope.$watch('config.general.language', function(newLan, oldLan) {
+			scope.$watch('config.general.language', function(newLan, oldLan) {
 				if (oldLan !== newLan){
 					kmtp.setCurrentLanguage(newLan);
 				}

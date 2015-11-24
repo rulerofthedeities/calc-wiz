@@ -17,6 +17,10 @@ var gulp = require('gulp'),
 				config.bowerDir + 'bootstrap/dist/css/bootstrap.min.css',
 				config.bowerDir + 'font-awesome/css/font-awesome.min.css'];
 
+	vendorFonts = [
+				config.bowerDir + '/font-awesome/fonts/**.*',
+				config.bowerDir + '/bootstrap/fonts/**.*'];
+
 gulp.task('vendor_scripts', function() {
 	return gulp.src(vendorJS)
 		.pipe(concat('vendor.js'))
@@ -30,7 +34,7 @@ gulp.task('vendor_styles', function() {
 });
 
 gulp.task('vendor_fonts', function() {
-	return gulp.src(config.bowerDir + '/font-awesome/fonts/**.*')
+	return gulp.src(vendorFonts)
 		.pipe(gulp.dest('public/fonts'));
 });
 

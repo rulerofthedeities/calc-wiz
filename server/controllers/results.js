@@ -44,11 +44,13 @@ module.exports = {
 	retrieve: function(req, res){
 		var query = req.query,
 			filter = {};
-		console.log(query);
 		
+		console.log(query);
+
 		if (query.completed == 'true'){
 			filter["timing.interrupted"] = false;
 		}
+		filter["user.name"] = query.user;
 
 		mongoClient.connect('mongodb://localhost:27017/calcwiz', function(err, db) {
 			assert.equal(null, err);
