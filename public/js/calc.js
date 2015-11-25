@@ -506,8 +506,9 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 })
 
 .controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter, user, translate){
+	var resultsTable;
 
-	this.getResultsTable = function(){
+	getResultsTable = function(){
 		var serverFilter = {
 			'user':user.getUserName(),
 			'completed':$scope.filter.completed
@@ -516,6 +517,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			//format in controller since filters are slow in repeats
 			angular.forEach(resultsArr, function(result){
 				result.tpe = translate.translate(utils.capitalizeFirstLetter(result.tpe));
+				result.name = result.user.name;
 				result.timing.elapse = msToTimeFilter(result.timing.elapse);
 				result.started = $filter('date')(result.timing.started, "dd/MM/yy HH:mm");
 				result.timing.completed = result.timing.interrupted ? translate.translate("No") : translate.translate("Yes");
@@ -524,12 +526,18 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 				result.perfect = result.totals.percentage == 100;
 			});
 			$scope.resultsTable = resultsArr;
+			resultsTable = resultsArr;
 		});
 	};
 
-	var self = this;
 	$scope.updateFilter = function(){
-		self.getResultsTable();
+		getResultsTable();
+	};
+
+	$scope.showDetailResult = function(indx){
+		$scope.currentInsert = $scope.currentInsert == indx ? null : indx;
+		$scope.detailResult = [];
+		$scope.detailResult[indx] = resultsTable[indx];
 	};
 
 	$scope.user = user.getUserName();
@@ -549,6 +557,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		date: translate.translate("Date")
 	};
 	$scope.tableHeaders = {
+		name: translate.translate("Name"),
 		tpe: translate.translate("Type"),
 		start:translate.translate("Start"),
 		correct: translate.translate("Correct"),
@@ -560,10 +569,10 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	$scope.$on('user', function(event, args) {
 		console.log("user updated");
 		$scope.user = args.name;
-		self.getResultsTable();
+		getResultsTable();
 	});
 
-	this.getResultsTable();
+	getResultsTable();
 
 })
 
@@ -823,12 +832,12 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 })
 
 .directive('exerciseResults', function(DEFAULTS) {
-    return {
-        restrict: 'E',
-        replace: true,
-        scope: {results:'='}, 
-        templateUrl: DEFAULTS.templateDir + 'result.htm'
-    };
+	return {
+		restrict: 'E',
+		replace: true,
+		scope: {results:'=', showHeader:'@'}, 
+		templateUrl: DEFAULTS.templateDir + 'result.htm'
+	};
 });
 
 //Load json files and bootstrap

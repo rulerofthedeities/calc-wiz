@@ -30,6 +30,7 @@
 		<thead>
 			<tr>
 				<th>#</th>
+				<th>{{tableHeaders.name}}</th>
 				<th>{{tableHeaders.tpe}}</th>
 				<th>{{tableHeaders.start}}</th>
 				<th>{{tableHeaders.correct}}</th>
@@ -39,14 +40,20 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat="result in resultsTable | filter:{tpe: search.tpe, started: filterDt}" ng-class="{'danger':result.timing.interrupted}">
+			<tr ng-repeat-start="result in resultsTable | filter:{tpe: search.tpe, started: filterDt} track by $index" ng-class="{'danger':result.timing.interrupted}" ng-click="showDetailResult($index)">
 				<td class="text-right">{{$index + 1}}.</td>
+				<td>{{result.name}}</td>
 				<td>{{result.tpe}}</td>
 				<td class="text-center">{{result.started}}</td>
 				<td class="text-center">{{result.totals.correct}}</td>
 				<td class="text-center" ng-class="{'success':result.perfect}">{{result.totals.percentage}}%</td>
 				<td class="text-center">{{result.timing.elapse}}</td>
 				<td class="text-center">{{result.timing.completed}}</td>
+			</tr>
+			<tr ng-repeat-end ng-hide="currentInsert!==$index">
+				<td colspan="7">
+					<exercise-results results="detailResult[$index]" showHeader="false"></exercise-results>
+				</td>
 			</tr>
 		</tbody>
     </table>
