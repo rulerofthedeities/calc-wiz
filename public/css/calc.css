@@ -157,8 +157,11 @@ input[name=remainder]{border-color:blue;}
 /* results  */
 /************/
 
-table th{
+table.results th{
 	text-align: center;
+}
+table.results tr.summary{
+	cursor: pointer;
 }
 
 /************/
@@ -187,6 +190,30 @@ table th{
 }
 .exercise .remainder{
 	font-size: 12px;
+}
+
+.animate-hide {
+	transition: all linear 0.3s;
+	position: relative;
+	top: -10px;
+}
+.animate-hide.ng-hide.ng-hide-remove {
+	top: -30px;
+}
+
+.animate-fade.ng-enter {
+  transition:0.5s linear all;
+  opacity:0;
+}
+.animate-fade.ng-enter.ng-enter-active {
+  opacity:1;
+}
+.animate-fade.ng-leave {
+  transition:0.5s linear all;
+  opacity:1;
+}
+.animate-fade.ng-leave.ng-leave-active {
+  opacity:0;
 }
 
 /************/

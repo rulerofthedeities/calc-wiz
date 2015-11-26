@@ -1,4 +1,4 @@
-angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlayer'])
+angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlayer', 'ngAnimate'])
 
 .constant("DEFAULTS",{	
 	'templateDir': 'views/directives/',
@@ -600,7 +600,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		replace: true,
 		templateUrl: DEFAULTS.templateDir + 'menu.htm',
 		controller: function($scope){
-			$scope.isMenuCollapsed = true;
+			$scope.isMenuCollapsed = false;
 		}
 	};
 })
@@ -835,7 +835,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	return {
 		restrict: 'E',
 		replace: true,
-		scope: {results:'=', showHeader:'@'}, 
+		scope: {results:'=', showHeader:'='}, 
 		templateUrl: DEFAULTS.templateDir + 'result.htm'
 	};
 });

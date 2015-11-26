@@ -7,12 +7,12 @@
 					<exercise-progress correct="ctrl.correct"></exercise-progress>
 				</div>
 			</div>
-			<div id="exercise" ng-class="ctrl.subviewType">
+			<div id="exercise" ng-class="ctrl.subviewType" >
 				<div ng-include="'views/sub/' + ctrl.subviewType +'question.htm'"></div> 
 			</div>
 		</div>
 		<div ng-switch-when="results">
-			<exercise-results results="ctrl.results" showHeader="false"></exercise-results>
+			<exercise-results results="ctrl.results" show-header="true"></exercise-results>
 		</div>
 	</div>
 </div> 

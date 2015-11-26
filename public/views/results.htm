@@ -26,7 +26,7 @@
 			</p>
 		</div>
 	</form>
-	<table class="table table-bordered table-striped table-hover table-condensed">
+	<table class="results table table-bordered table-striped table-hover table-condensed">
 		<thead>
 			<tr>
 				<th>#</th>
@@ -40,7 +40,10 @@
 			</tr>
 		</thead>
 		<tbody>
-			<tr ng-repeat-start="result in resultsTable | filter:{tpe: search.tpe, started: filterDt} track by $index" ng-class="{'danger':result.timing.interrupted}" ng-click="showDetailResult($index)">
+			<tr ng-repeat-start="result in resultsTable | filter:{tpe: search.tpe, started: filterDt} track by $index" 
+				ng-class="{'danger':result.timing.interrupted}" 
+				ng-click="showDetailResult($index)"
+				class="summary animate-fade">
 				<td class="text-right">{{$index + 1}}.</td>
 				<td>{{result.name}}</td>
 				<td>{{result.tpe}}</td>
@@ -51,8 +54,11 @@
 				<td class="text-center">{{result.timing.completed}}</td>
 			</tr>
 			<tr ng-repeat-end ng-hide="currentInsert!==$index">
-				<td colspan="7">
-					<exercise-results results="detailResult[$index]" showHeader="false"></exercise-results>
+				<td colspan="8" ng-hide="currentInsert!==$index" class="animate-hide">
+					<exercise-results
+						results="detailResult[$index]" 
+						show-header="false">
+					</exercise-results>
 				</td>
 			</tr>
 		</tbody>

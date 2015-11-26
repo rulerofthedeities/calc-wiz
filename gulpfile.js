@@ -11,7 +11,8 @@ var gulp = require('gulp'),
 				config.bowerDir + 'angular/angular.js',
 				config.bowerDir + 'angular-route/angular-route.js',
 				config.bowerDir + 'angular-media-player/dist/angular-media-player.js',
-				config.bowerDir + 'angular-bootstrap/ui-bootstrap-tpls.js'];
+				config.bowerDir + 'angular-bootstrap/ui-bootstrap-tpls.js',
+				config.bowerDir + 'angular-animate/angular-animate.js'];
 
 	vendorCSS 	= [
 				config.bowerDir + 'bootstrap/dist/css/bootstrap.min.css',
