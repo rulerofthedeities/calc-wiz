@@ -1,6 +1,7 @@
 # Source files
 source
 testresult.htm
+public/views/loginold.htm
 
 # PSDs
 *.psd

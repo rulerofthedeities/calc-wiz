@@ -7,6 +7,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
         </button>
+		<span class="navbar-text navbar-right username">{{userName}}</span> 
 		<span class="navbar-brand">{{title | translate}}</span>
 	</div>
 
@@ -16,15 +17,10 @@
 			<li><a href="#/config"><i class="fa fa-wrench"></i> <span translate="content">Configuration</span></a></li>
 		</ul>
 	</nav>
-
 	<nav uib-collapse="isHeaderCollapsed" class="navbar-right">
-		<ul class="nav navbar-nav" ng-controller="loginCtrl">
-			<li ng-if="user.name!=='anonymous'"><a href="#" ng-click='$event.preventDefault()'>{{user.name}}</a></li>
-			<li ng-if="user.name==='anonymous'">
-				<a ng-click="openModal()"><i class="fa fa-unlock"></i> <span translate="content">Login</span></a>
-			</li>
-			<li ng-if="user.name!=='anonymous'">
-				<a ng-click="logOut()"><i class="fa fa-unlock"></i> <span translate="content">Logout</span></a>
+		<ul class="nav navbar-nav">
+			<li ng-controller="loginCtrl">
+				<a ng-click="openModal()"><i class="fa fa-unlock"></i> <span translate="content">Change username</span></a>
 			</li>
 		</ul>
 	</nav>

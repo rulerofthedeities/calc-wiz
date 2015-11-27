@@ -22,6 +22,9 @@ span.icon {
 .navbar {
     margin-bottom: 0;
 }
+.navbar .username{
+	margin-right:20px;
+}
 
 /* ui-bootstrap */
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }
@@ -164,6 +167,30 @@ table.results tr.summary{
 	cursor: pointer;
 }
 
+.animate-hide {
+	transition: all linear 0.3s;
+	position: relative;
+	top: 0px;
+}
+.animate-hide.ng-hide.ng-hide-remove {
+	top: -50px;
+}
+
+.animate-fade.ng-enter {
+	transition:0.5s linear all;
+	opacity:0;
+}
+.animate-fade.ng-enter.ng-enter-active {
+	opacity:1;
+}
+.animate-fade.ng-leave {
+	transition:0.5s linear all;
+	opacity:1;
+}
+.animate-fade.ng-leave.ng-leave-active {
+	opacity:0;
+}
+
 /************/
 /* result   */
 /************/
@@ -192,29 +219,6 @@ table.results tr.summary{
 	font-size: 12px;
 }
 
-.animate-hide {
-	transition: all linear 0.3s;
-	position: relative;
-	top: -10px;
-}
-.animate-hide.ng-hide.ng-hide-remove {
-	top: -30px;
-}
-
-.animate-fade.ng-enter {
-  transition:0.5s linear all;
-  opacity:0;
-}
-.animate-fade.ng-enter.ng-enter-active {
-  opacity:1;
-}
-.animate-fade.ng-leave {
-  transition:0.5s linear all;
-  opacity:1;
-}
-.animate-fade.ng-leave.ng-leave-active {
-  opacity:0;
-}
 
 /************/
 /* config   */

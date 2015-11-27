@@ -60,7 +60,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
-.factory("user", function(){
+.factory("user", function($rootScope){
 	var defUser = {name:"anonymous"},
 		key = 'calc-wiz-user',
 		user = angular.copy(defUser);
@@ -74,24 +74,20 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		},
 		login: function(newUser){
 			user.name = newUser.name;
-			user.email = newUser.email;
+			$rootScope.$broadcast('user:updated', {'name':user.name});
 			this.save();
-			$scope.$broadcast('user', {'name':newUser.name});
 		},
 		logout: function(){
-			user = defUser;
-			$scope.$broadcast('user', {'name':user.name});
+			user = angular.copy(defUser);
 			return user.name;
+			//$rootScope.$broadcast('user:updated', {'name':user.name});
 		},
 		load: function(){
 			var userData = localStorage.getItem(key);
 			userData = JSON.parse(userData);
 			if (userData){
 				user.name = userData.name;
-			} else {
-				user.name = defUser.name;
 			}
-			return user;
 		},
 		save: function(){
 			var toSave = {
@@ -411,10 +407,11 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	$scope.title = utils.capitalizeFirstLetter($routeParams.type);
 })
 
-.controller("loginCtrl", function($scope, $uibModal, $log, user){
+.controller("loginCtrl", function($scope, $uibModal, user){
 
 	var data = {};
 	//data.email = "test@yahoo.com";
+	data.name = $scope.userName;
 
 	$scope.openModal = function (size) {
 		var modalInstance = $uibModal.open({
@@ -430,7 +427,6 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			}
 		});
 		modalInstance.result.then(function (loginData) {
-	     	$log.info(loginData);
 	     	if (loginData.name){
 	     		user.login(loginData);
 	     	}
@@ -440,7 +436,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
   	};
 
   	$scope.logOut = function(){
-  		$scope.user.name = user.logout();
+  		$scope.userName = user.logout();
   	};
 })
 
@@ -455,6 +451,77 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		$uibModalInstance.dismiss('cancel');
 	};
 })
+
+.controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter, user, translate){
+	var resultsTable;
+
+	getResultsTable = function(){
+		var serverFilter = {
+			'user':user.getUserName(),
+			'completed':$scope.filter.completed
+		};
+		results.fetchAllResults(serverFilter, function(resultsArr){
+			//format in controller since filters are slow in repeats
+			angular.forEach(resultsArr, function(result){
+				result.tpe = translate.translate(utils.capitalizeFirstLetter(result.tpe));
+				result.name = result.user.name;
+				result.timing.elapse = msToTimeFilter(result.timing.elapse);
+				result.started = $filter('date')(result.timing.started, "dd/MM/yy HH:mm");
+				result.timing.completed = result.timing.interrupted ? translate.translate("No") : translate.translate("Yes");
+				result.totals.correct = result.totals.correct + '/' + result.totals.nrOfQuestions;
+				result.totals.percentage = Math.round(result.totals.percentage);
+				result.perfect = result.totals.percentage == 100;
+			});
+			$scope.resultsTable = resultsArr;
+			resultsTable = resultsArr;
+		});
+	};
+
+	$scope.updateFilter = function(){
+		getResultsTable();
+	};
+
+	$scope.showDetailResult = function(indx){
+		$scope.currentInsert = $scope.currentInsert == indx ? null : indx;
+		$scope.detailResult = [];
+		$scope.detailResult[indx] = resultsTable[indx];
+	};
+
+	$scope.userName = user.getUserName();
+	//initialize filter
+	$scope.filter = {
+		completed: true,
+		tpes: [
+			{val: "", name: translate.translate("All Exercises")},
+			{val: translate.translate("Addition")},
+			{val: translate.translate("Subtraction")},
+			{val: translate.translate("Multiplication")},
+			{val: translate.translate("Division")}]
+	};
+	$scope.filterLabels = {
+		completed: translate.translate("Completed only"),
+		type: translate.translate("Type"),
+		date: translate.translate("Date")
+	};
+	$scope.tableHeaders = {
+		name: translate.translate("Name"),
+		tpe: translate.translate("Type"),
+		start:translate.translate("Start"),
+		correct: translate.translate("Correct"),
+		perc: translate.translate("Percentage"),
+		time: translate.translate("Elapse Time"),
+		completed: translate.translate("Completed")
+	};
+
+	$scope.$on('user:updated', function(event, data) {
+		$scope.userName = data.name;
+		getResultsTable();
+	});
+
+	getResultsTable();
+
+})
+
 
 .directive("datePicker", function(DEFAULTS, translate){
 	return{
@@ -505,77 +572,6 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
-.controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter, user, translate){
-	var resultsTable;
-
-	getResultsTable = function(){
-		var serverFilter = {
-			'user':user.getUserName(),
-			'completed':$scope.filter.completed
-		};
-		results.fetchAllResults(serverFilter, function(resultsArr){
-			//format in controller since filters are slow in repeats
-			angular.forEach(resultsArr, function(result){
-				result.tpe = translate.translate(utils.capitalizeFirstLetter(result.tpe));
-				result.name = result.user.name;
-				result.timing.elapse = msToTimeFilter(result.timing.elapse);
-				result.started = $filter('date')(result.timing.started, "dd/MM/yy HH:mm");
-				result.timing.completed = result.timing.interrupted ? translate.translate("No") : translate.translate("Yes");
-				result.totals.correct = result.totals.correct + '/' + result.totals.nrOfQuestions;
-				result.totals.percentage = Math.round(result.totals.percentage);
-				result.perfect = result.totals.percentage == 100;
-			});
-			$scope.resultsTable = resultsArr;
-			resultsTable = resultsArr;
-		});
-	};
-
-	$scope.updateFilter = function(){
-		getResultsTable();
-	};
-
-	$scope.showDetailResult = function(indx){
-		$scope.currentInsert = $scope.currentInsert == indx ? null : indx;
-		$scope.detailResult = [];
-		$scope.detailResult[indx] = resultsTable[indx];
-	};
-
-	$scope.user = user.getUserName();
-	//initialize filter
-	$scope.filter = {
-		completed: true,
-		tpes: [
-			{val: "", name: translate.translate("All Exercises")},
-			{val: translate.translate("Addition")},
-			{val: translate.translate("Subtraction")},
-			{val: translate.translate("Multiplication")},
-			{val: translate.translate("Division")}]
-	};
-	$scope.filterLabels = {
-		completed: translate.translate("Completed only"),
-		type: translate.translate("Type"),
-		date: translate.translate("Date")
-	};
-	$scope.tableHeaders = {
-		name: translate.translate("Name"),
-		tpe: translate.translate("Type"),
-		start:translate.translate("Start"),
-		correct: translate.translate("Correct"),
-		perc: translate.translate("Percentage"),
-		time: translate.translate("Elapse Time"),
-		completed: translate.translate("Completed")
-	};
-
-	$scope.$on('user', function(event, args) {
-		console.log("user updated");
-		$scope.user = args.name;
-		getResultsTable();
-	});
-
-	getResultsTable();
-
-})
-
 .directive("calcAudio", function(DEFAULTS, settings){
 	return{
 		restrict: 'E',
@@ -613,7 +609,10 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		templateUrl: DEFAULTS.templateDir + 'header.htm',
 		controller: function($scope){
 			$scope.isHeaderCollapsed = true;
-			$scope.user = user.load();
+			$scope.userName = user.getUserName();
+			$scope.$on('user:updated', function(event, data) {
+				$scope.userName = data.name;
+			});
 		}
 	};
 })

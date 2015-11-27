@@ -12,6 +12,7 @@ var findResultDocs = function(db, filter, callback) {
 			user:true
 		},
 		cursor = db.collection('results').find(filter, fields);
+
 	cursor.each(function(err, doc) {
 		assert.equal(err, null);
 		if (doc !== null) {
@@ -53,7 +54,7 @@ module.exports = {
 		if (query.completed == 'true'){
 			filter["timing.interrupted"] = false;
 		}
-		//filter["user.name"] = query.user;
+		filter["user.name"] = query.user;
 
 		mongoClient.connect('mongodb://localhost:27017/calcwiz', function(err, db) {
 			assert.equal(null, err);
