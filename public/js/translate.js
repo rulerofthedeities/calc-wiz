@@ -1,43 +1,54 @@
+'use strict';
+
 angular.module('km.translate', [])
 
-.constant(
-	'DEFAULTS', {
-		'LAN': 'en', 
-		'CASE': 'nom', 
+.constant({
+	'version' : '1.0.0',
+	'DEFAULTS': {
+		'LAN': 'en',
+		'CASE': 'nom',
 		'FILE': 'json/translations.json',
 		'FORMATS': ['lan', "term"],
 		'FORMAT': 'lan'
 	}
-)
+})
 
-.service('kmts', ['$http', '$log', 'kmtp', function ($http, $log, kmtp){
-	var translationTable,
+.service('kmTranslateFile', ['$http', '$log', 'kmTranslateConfig', function ($http, $log, kmTranslateConfig){
+	var translationTableFromFile,
 		promise,
 		fileName;
 
-	fileName = kmtp.getTranslationFile();
-	promise = $http.get(fileName);
-
 	return {
-		promise: promise.then(
-			function (response) {
-				$log.info("Fetched translation data from '" + fileName + "'");
-				translationTable = response.data;
-			},
-			function(response){
-				$log.error("File '" + fileName + "' not found.");
+		promise: function(){
+			if (promise){
+				return promise;
+			} else {
+				fileName = kmTranslateConfig.getTranslationFileName();
+				promise = $http.get(fileName).then(
+					function (response) {
+						if (response){
+							$log.info("Fetched translation data from '" + fileName + "'");
+							translationTableFromFile = response.data;
+						}
+					},
+					function(response){
+						$log.error("File '" + fileName + "' not found.");
+					}
+				);
+				return promise;
 			}
-		),
+		},
 		getTranslationTable: function () {
-			return translationTable;
+			return translationTableFromFile;
 		}
 	};
 }])
 
-.provider('kmtp', ['DEFAULTS', function(DEFAULTS) {
+.provider('kmTranslateConfig', ['DEFAULTS', function(DEFAULTS) {
 	var lan = DEFAULTS.LAN,
 		translationFile = DEFAULTS.FILE,
-		formatType = DEFAULTS.FORMAT;
+		formatType = DEFAULTS.FORMAT,
+		translationTableFromObject = null;
 
 	return {
 		configSetCurrentLanguage: function(newLan) {
@@ -50,6 +61,9 @@ angular.module('km.translate', [])
 			}
 			formatType = format;
 		},
+		configSetTranslationTable: function (newTranslationTable) {
+			translationTableFromObject = newTranslationTable;
+		},
 
 	    $get: function() {
 	        return {
@@ -59,45 +73,48 @@ angular.module('km.translate', [])
 	            setCurrentLanguage: function(newLan){
 	            	lan = newLan || lan || DEFAULTS.LAN;
 	            },
-				insert: function(srcStr, toInsert){
-					var resultStr = srcStr;
-					if (toInsert.constructor === Array){
-						for (var i = 0, find; i < toInsert.length; i++){
-							find = new RegExp('\%i' + (i + 1));
-							resultStr = resultStr.replace(find, toInsert[i]);
-						}
-						for (i = 0; i < toInsert.length; i++){
-							resultStr = resultStr.replace(/\%s/, toInsert[i]);
-						}
-					} else {
-						resultStr = srcStr.replace(/\%s/g, toInsert);
-					}
-					return resultStr;
-				},
-				getTranslationFile: function(){
+				getTranslationFileName: function(){
 					return translationFile || DEFAULTS.FILE;
 				},
 				getFileFormat: function(){
 					return formatType;
 				},
-	        };
+				getTranslationTable: function () {
+					return translationTableFromObject;
+				}
+	    	};
 		}
 	};
 
 }])
 
-.factory('translate', ['DEFAULTS', 'kmtp', 'kmts', function(DEFAULTS, kmtp, kmts){
+.factory('kmTranslate', ['DEFAULTS', 'kmTranslateConfig', 'kmTranslateFile', function(DEFAULTS, kmTranslateConfig, kmTranslateFile){
 	return {
+		_insert: function(srcStr, toInsert){
+			var resultStr = srcStr;
+			if (toInsert.constructor === Array){
+				for (var i = 0, find; i < toInsert.length; i++){
+					find = new RegExp('\%i' + (i + 1));
+					resultStr = resultStr.replace(find, toInsert[i]);
+				}
+				for (i = 0; i < toInsert.length; i++){
+					resultStr = resultStr.replace(/\%s/, toInsert[i]);
+				}
+			} else {
+				resultStr = srcStr.replace(/\%s/g, toInsert);
+			}
+			return resultStr;
+		},
 		translate: function(strToTranslate, options){
-			var lan = kmtp.getCurrentLanguage(),
+			var lan = kmTranslateConfig.getCurrentLanguage(),
 				translation = strToTranslate,
 				cas,
-				translateTable = kmts.getTranslationTable(),
-				format;//array indices depend on the format of the JSON source 
-				
+				translateTable = kmTranslateFile.getTranslationTable() || kmTranslateConfig.getTranslationTable(), //table loaded from file or from object
+				format;//array indices depend on the format of the JSON source
+
 			options = options || {};
 			strToTranslate = options.alias || strToTranslate;
-			format = kmtp.getFileFormat() === "term" ? [strToTranslate, lan] : [lan, strToTranslate];
+			format = kmTranslateConfig.getFileFormat() === "term" ? [strToTranslate, lan] : [lan, strToTranslate];
 			cas = options['case'];
 
 			if (translateTable && translateTable[format[0]] && translateTable[format[0]][format[1]]){
@@ -120,7 +137,7 @@ angular.module('km.translate', [])
 			}
 			//Check if there are strings to be inserted
 			if ((/\%s/.test(translation) ||  (/\%i\d/.test(translation))) && options.insert){
-				translation = kmtp.insert(translation, options.insert);
+				translation = this._insert(translation, options.insert);
 				return translation;
 			} else {
 				return translation;
@@ -129,9 +146,9 @@ angular.module('km.translate', [])
 	};
 }])
 
-.filter('translate', ['translate', function(translate){
-	return function(input){
-		var translation = translate.translate(input);
+.filter('translate', ['kmTranslate', function(kmTranslate){
+	return function(input, options){
+		var translation = kmTranslate.translate(input, options);
 		if (translation){
 			return translation;
 		} else {
@@ -140,7 +157,7 @@ angular.module('km.translate', [])
 	};
 }])
 
-.directive('translate', ['translate', '$compile', function(translate, $compile){
+.directive('translate', ['kmTranslate', '$compile', function(kmTranslate, $compile){
 	return {
 		compile: function(scope, element, attributes){
 			return {
@@ -151,13 +168,13 @@ angular.module('km.translate', [])
 
 					if (params){
 						if (params === "content"){
-							iElement.html(translate.translate(iElement.text()));
+							iElement.html(kmTranslate.translate(iElement.text()));
 						}
 						else {
-							input = JSON.parse(params.replace(/\'/g, '"'));
+							var input = JSON.parse(params.replace(/\'/g, '"'));
 							attrToTranslate = input.attr;
 							toTranslate = iAttrs[attrToTranslate];
-							iAttrs.$set(attrToTranslate, translate.translate(toTranslate));
+							iAttrs.$set(attrToTranslate, kmTranslate.translate(toTranslate));
 							iAttrs.$set("translate", ""); //To prevent looping
 
 							$compile(iElement)(scope);
@@ -168,4 +185,3 @@ angular.module('km.translate', [])
 		}
 	};
 }]);
-

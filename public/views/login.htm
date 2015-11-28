@@ -10,11 +10,11 @@
                     <input 
                         type="name" 
                         ng-model="login.name" 
-                        class="form-control input-lg" 
+                        class="form-control input-lg validateColor" 
                         id="inputName" 
                         autofocus
                         autocomplete="off"
-                        pattern="^[a-z0-9_-]{3,16}$"
+                        pattern="^[a-zA-Z0-9_-]{3,16}$"
                         required >
                     <span class="text-danger" ng-show="showError" translate="content">The username must have between 3 and 16 characters. Valid characters are digits, letters, hyphen and underscore.</span>
                 </div>

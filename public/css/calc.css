@@ -275,13 +275,13 @@ table.results tr.summary{
 /* Login         */
 /*****************/
 
-.ng-valid.ng-dirty{
+.validateColor.ng-valid.ng-dirty{
 	border-color:green;
 	border-bottom-color:green;
 	border-bottom-width: 2px;
 }
 
-.ng-invalid.ng-dirty{
+.validateColor.ng-invalid.ng-dirty{
 	border-color:red;
 	border-bottom-color:red;
 	border-bottom-width: 2px;

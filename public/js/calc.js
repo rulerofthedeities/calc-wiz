@@ -9,9 +9,9 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	})
 
 .config(function($routeProvider){
-	var translationResolve = ['kmts', 
-  		function(kmts){
-			return kmts.promise; 
+	var translationResolve = ['kmTranslateFile', 
+  		function(kmTranslateFile){
+			return kmTranslateFile.promise(); 
 	}],
 
 	customRouteProvider = angular.extend({}, $routeProvider, {
@@ -37,7 +37,6 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 })
 
 .run(function(user){
-
 	user.load().then(function(userData){
 		if (userData){
 			userData = JSON.parse(userData);
@@ -453,7 +452,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
   	};
 })
 
-.controller('modalLoginCtrl', function ($scope, $uibModalInstance, translate, data) {
+.controller('modalLoginCtrl', function ($scope, $uibModalInstance, data) {
 
 	$scope.ok = function (isValid) {
 		if (isValid){
@@ -468,7 +467,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
-.controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter, user, translate){
+.controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter, user, kmTranslate){
 	var resultsTable;
 
 	getResultsTable = function(){
@@ -479,11 +478,11 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		results.fetchAllResults(serverFilter, function(resultsArr){
 			//format in controller since filters are slow in repeats
 			angular.forEach(resultsArr, function(result){
-				result.tpe = translate.translate(utils.capitalizeFirstLetter(result.tpe));
+				result.tpe = kmTranslate.translate(utils.capitalizeFirstLetter(result.tpe));
 				result.name = result.user.name;
 				result.timing.elapse = msToTimeFilter(result.timing.elapse);
 				result.started = $filter('date')(result.timing.started, "dd/MM/yy HH:mm");
-				result.timing.completed = result.timing.interrupted ? translate.translate("No") : translate.translate("Yes");
+				result.timing.completed = result.timing.interrupted ? kmTranslate.translate("No") : kmTranslate.translate("Yes");
 				result.totals.correct = result.totals.correct + '/' + result.totals.nrOfQuestions;
 				result.totals.percentage = Math.round(result.totals.percentage);
 				result.perfect = result.totals.percentage == 100;
@@ -508,25 +507,25 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	$scope.filter = {
 		completed: true,
 		tpes: [
-			{val: "", name: translate.translate("All Exercises")},
-			{val: translate.translate("Addition")},
-			{val: translate.translate("Subtraction")},
-			{val: translate.translate("Multiplication")},
-			{val: translate.translate("Division")}]
+			{val: "", name: kmTranslate.translate("All Exercises")},
+			{val: kmTranslate.translate("Addition")},
+			{val: kmTranslate.translate("Subtraction")},
+			{val: kmTranslate.translate("Multiplication")},
+			{val: kmTranslate.translate("Division")}]
 	};
 	$scope.filterLabels = {
-		completed: translate.translate("Completed only"),
-		type: translate.translate("Type"),
-		date: translate.translate("Date")
+		completed: kmTranslate.translate("Completed only"),
+		type: kmTranslate.translate("Type"),
+		date: kmTranslate.translate("Date")
 	};
 	$scope.tableHeaders = {
-		name: translate.translate("Name"),
-		tpe: translate.translate("Type"),
-		start:translate.translate("Start"),
-		correct: translate.translate("Correct"),
-		perc: translate.translate("Percentage"),
-		time: translate.translate("Elapse Time"),
-		completed: translate.translate("Completed")
+		name: kmTranslate.translate("Name"),
+		tpe: kmTranslate.translate("Type"),
+		start: kmTranslate.translate("Start"),
+		correct: kmTranslate.translate("Correct"),
+		perc: kmTranslate.translate("Percentage"),
+		time: kmTranslate.translate("Elapse Time"),
+		completed: kmTranslate.translate("Completed")
 	};
 
 	$scope.$on('user:updated', function(event, data) {
@@ -539,17 +538,17 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 })
 
 
-.directive("datePicker", function(DEFAULTS, translate){
+.directive("datePicker", function(DEFAULTS, kmTranslate){
 	return{
 		restrict:'E',
 		templateUrl: DEFAULTS.templateDir + 'datepicker.htm',
 		controller: 
 		function ($scope, $filter) {
 			$scope.labels = {
-				main: translate.translate("Date"),
-				close: translate.translate("Close"),
-				today: translate.translate("Today"),
-				clear: translate.translate("Clear")
+				main: kmTranslate.translate("Date"),
+				close: kmTranslate.translate("Close"),
+				today: kmTranslate.translate("Today"),
+				clear: kmTranslate.translate("Clear")
 			};
 			
 			$scope.today = function() {
@@ -633,7 +632,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
-.directive("calcConfig", function(config, settings, DEFAULTS, translate, kmtp){
+.directive("calcConfig", function(config, settings, DEFAULTS, kmTranslate, kmTranslateConfig){
 	return{
 		restrict: 'E',
 		replace: true,
@@ -645,27 +644,27 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			this.general = settings.general;
 			this.updateConfig = function(){
 				if (config.saveConfigFile()){
-					this.msg = translate.translate("Your changes have been submitted");
-					kmtp.setCurrentLanguage(settings.general.language);
+					this.msg = kmTranslate.translate("Your changes have been submitted");
+					kmTranslateConfig.setCurrentLanguage(settings.general.language);
 					$scope.configForm.$setPristine();
 				}
 			};
 			this.labels = {
-				"language": translate.translate("Language"),
-				"questions": translate.translate("No of questions"),
-				"audio": translate.translate("Audio"),
-				"total": translate.translate("Total"),
-				"term": translate.translate("Term"),
-				"min": translate.translate("min"),
-				"max": translate.translate("max"),
-				"remainder": translate.translate("Remainder")
+				"language": kmTranslate.translate("Language"),
+				"questions": kmTranslate.translate("No of questions"),
+				"audio": kmTranslate.translate("Audio"),
+				"total": kmTranslate.translate("Total"),
+				"term": kmTranslate.translate("Term"),
+				"min": kmTranslate.translate("min"),
+				"max": kmTranslate.translate("max"),
+				"remainder": kmTranslate.translate("Remainder")
 			};
 			
 		},
 		link: function(scope, element, attr) {
 			scope.$watch('config.general.language', function(newLan, oldLan) {
 				if (oldLan !== newLan){
-					kmtp.setCurrentLanguage(newLan);
+					kmTranslateConfig.setCurrentLanguage(newLan);
 				}
 			});
 
@@ -726,7 +725,7 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 })
 
 
-.directive("calcExercise", function(DEFAULTS, translate, setFocus){
+.directive("calcExercise", function(DEFAULTS, kmTranslate, setFocus){
 
 	return {
 		restrict: 'E',
@@ -797,8 +796,8 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 			this.subviewType = this.type === "addition" || this.type === "subtraction" ? "addsub" : this.type;
 			this.maxNr = settings.general.nrOfQuestions;
 			this.correct = [];
-			this.btnMessageCorrect = translate.translate(settings.btnMessage.active);
-			this.btnMessageIncorrect = translate.translate(settings.btnMessage.inActive);
+			this.btnMessageCorrect = kmTranslate.translate(settings.btnMessage.active);
+			this.btnMessageIncorrect = kmTranslate.translate(settings.btnMessage.inActive);
 			
 			results.init(calcExercise);
 			this.init();
@@ -881,9 +880,9 @@ angular.element(document).ready(function () {
 			angular.module('kmCalc')
 				.value('settings', configResponse.data)
 				.value("configFileName", configFileName)
-				.config(['kmtpProvider', function(kmtpProvider){
-					kmtpProvider.configSetCurrentLanguage(configResponse.data.general.language);
-					kmtpProvider.configSetTranslationFile("json/translate.json", "lan");
+				.config(['kmTranslateConfigProvider', function(kmTranslateConfigProvider){
+					kmTranslateConfigProvider.configSetCurrentLanguage(configResponse.data.general.language);
+					kmTranslateConfigProvider.configSetTranslationFile("json/translate.json", "lan");
 				}]);
 				angular.bootstrap(document, ['kmCalc'], true);
 		},
