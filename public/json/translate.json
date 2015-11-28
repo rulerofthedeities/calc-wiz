@@ -54,6 +54,8 @@
 		"Logout": "Afmelden",
 		"Enter your username": "Voer je gebruikersnaam in",
 		"Change username": "Andere gebruikersnaam",
-		"Results for user": "Resultaten voor gebruiker"
+		"Results for user": "Resultaten voor gebruiker",
+		"The username must have between 3 and 16 characters. Valid characters are digits, letters, hyphen and underscore.":
+			"De gebruikersnaam moet tussen de 3 en 16 karakters bevatten. Geldige karakters zijn cijfers, letters, - en _."
 	}
 }

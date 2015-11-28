@@ -450,8 +450,12 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 .controller('modalLoginCtrl', function ($scope, $uibModalInstance, translate, data) {
 	$scope.login = data;
 
-	$scope.ok = function () {
-		$uibModalInstance.close($scope.login);
+	$scope.ok = function (isValid) {
+		if (isValid){
+			$uibModalInstance.close($scope.login);
+		} else {
+			$scope.showError = true;
+		}
 	};
 
 	$scope.cancel = function () {
