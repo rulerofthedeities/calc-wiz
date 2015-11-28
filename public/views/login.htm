@@ -12,6 +12,7 @@
                         ng-model="login.name" 
                         class="form-control input-lg" 
                         id="inputName" 
+                        autofocus
                         autocomplete="off"
                         pattern="^[a-z0-9_-]{3,16}$"
                         required >
@@ -21,7 +22,7 @@
             <div class="form-group">
                 <div class="col-xs-offset-2 col-xs-10">
                     <button 
-                        type="button" 
+                        type="submit" 
                         class="btn btn-primary" 
                         translate="content" 
                         ng-click="ok(nameForm.$valid)">Login</button>

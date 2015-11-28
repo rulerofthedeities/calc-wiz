@@ -37,7 +37,13 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 })
 
 .run(function(user){
-	//user.load();
+
+	user.load().then(function(userData){
+		if (userData){
+			userData = JSON.parse(userData);
+			user.login(userData);
+		}
+	});
 })
 
 .factory("utils", function(){
@@ -67,8 +73,8 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	};
 })
 
-.factory("user", function($rootScope){
-	var defUser = {name:"anonymous"},
+.factory("user", function($rootScope, $q, $timeout){
+	var defUser = {name:"demo"},
 		key = 'calc-wiz-user',
 		user = angular.copy(defUser);
 		
@@ -87,20 +93,20 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 		logout: function(){
 			user = angular.copy(defUser);
 			return user.name;
-			//$rootScope.$broadcast('user:updated', {'name':user.name});
-		},
-		load: function(){
-			var userData = localStorage.getItem(key);
-			userData = JSON.parse(userData);
-			if (userData){
-				user.name = userData.name;
-			}
 		},
 		save: function(){
 			var toSave = {
 				'name': user.name
 			};
 			localStorage.setItem(key, JSON.stringify(toSave));
+		},
+		load: function(){
+			var deferred = $q.defer();
+
+			var userData = localStorage.getItem(key);
+			deferred.resolve(userData);
+
+			return deferred.promise;
 		}
 	};
 })
@@ -448,7 +454,6 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 })
 
 .controller('modalLoginCtrl', function ($scope, $uibModalInstance, translate, data) {
-	$scope.login = data;
 
 	$scope.ok = function (isValid) {
 		if (isValid){
