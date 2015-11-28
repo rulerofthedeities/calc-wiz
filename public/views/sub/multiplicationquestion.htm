@@ -8,6 +8,7 @@
 				class="helper" 
 				ng-repeat="field in ctrl.question.helpers.helpFields" 
 				fix-backspace
+				parse-input
 				caret="0"
 				ng-model="field.value"
 				autocomplete="off" 
@@ -18,8 +19,9 @@
 			name="answer" 
 			ng-model="ctrl.userAnswer" 
 			setfocus="ctrl.setFocus" 
-			auto-focus 
 			fix-backspace
+			parse-input
+			auto-focus 
 			pull-right
 			caret="0"
 			autocomplete="off" 

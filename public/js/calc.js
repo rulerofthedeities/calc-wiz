@@ -36,6 +36,10 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 	}).otherwise({redirectTo: '/'});
 })
 
+.run(function(user){
+	//user.load();
+})
+
 .factory("utils", function(){
 	return {
 		getRandomInt : function(min, max) {
@@ -56,6 +60,9 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
 				}
 			}
 			return parms.join("&");
+		},
+		isInArray: function(arr, needle){
+			return ~arr.indexOf(needle);
 		}
 	};
 })
@@ -803,19 +810,28 @@ angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlaye
     };
 })
 
-.directive('fixBackspace', function() {
+.directive('parseInput', function(utils) {
 	return function(scope, element, attr) {
 		element[0].onkeydown = function(event) {
-			//Remove last entered digit if backspace key is pressed
 			var key = event.keyCode || event.charCode,
-				no = this.value.toString(),
-				newno = "";
-			for (var i = no.length - 1; i > 0; i--){
-				newno = no[i] + newno;
+				validKeys = [189, 13, 8];
+
+			//Only digits or special characters
+			if ((key < 96 || key > 105) && !utils.isInArray(validKeys, key)){
+				//invalid key
+				event.preventDefault();
 			}
-			newno += ' ';
-			if (key === 8){
-				this.value = newno;
+			if (attr.fixBackspace !== undefined){
+				//Remove last entered digit if backspace key is pressed
+				var no = this.value.toString(),
+					newno = "";
+				for (var i = no.length - 1; i > 0; i--){
+					newno = no[i] + newno;
+				}
+				newno += ' ';
+				if (key === 8){
+					this.value = newno;
+				}
 			}
 		};
 	};
