@@ -48,8 +48,6 @@ module.exports = {
 	retrieve: function(req, res){
 		var query = req.query,
 			filter = {};
-		
-		console.log(query);
 
 		if (query.completed == 'true'){
 			filter["timing.interrupted"] = false;
