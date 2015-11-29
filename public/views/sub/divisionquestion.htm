@@ -8,6 +8,7 @@
 			<input 
 				type="text" 
 				class="helper" 
+				maxlength="6" 
 				ng-repeat="field in ctrl.question.helpers.helpFields" 
 				ng-class="[field.offset, field.width]">
 		</div>
@@ -18,6 +19,7 @@
 			parse-input
 			auto-focus 
 			autocomplete="off" 
+			maxlength="10" 
 			ng-class="{'red':!ctrl.isCorrectAnswer.answer}" 
 			ng-disabled="!ctrl.isCorrectAnswer.all"
 			class="pull-left div"
@@ -27,6 +29,7 @@
 			name="remainder" 
 			ng-model="ctrl.question.remainder" 
 			autocomplete="off" 
+			maxlength="10" 
 			ng-class="{'red':!ctrl.isCorrectAnswer.remainder}" 
 			ng-disabled="!ctrl.isCorrectAnswer.all"
 			class="pull-left div">

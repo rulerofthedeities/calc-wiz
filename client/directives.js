@@ -101,7 +101,6 @@
 		return{
 			restrict: 'E',
 			replace: true,
-			scope: {},
 			templateUrl: DEFAULTS.templateDir + 'config.htm',
 			controllerAs: 'config',
 			controller: function($scope){

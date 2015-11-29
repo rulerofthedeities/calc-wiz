@@ -12,6 +12,7 @@
 				caret="0"
 				ng-model="field.value"
 				autocomplete="off" 
+				maxlength="10" 
 				ng-class="[field.offset, field.width]">
 		</div>
 		<label class="sr-only" for="answer">Answer</label>
@@ -25,6 +26,7 @@
 			pull-right
 			caret="0"
 			autocomplete="off" 
+			maxlength="12" 
 			ng-class="{'red':!ctrl.isCorrectAnswer.answer}" 
 			ng-disabled="!ctrl.isCorrectAnswer.all"
 			ng-style="{width:(ctrl.question.helpers.ansLen * 46) + 'px'}"

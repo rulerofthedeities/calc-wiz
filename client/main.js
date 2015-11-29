@@ -12,7 +12,7 @@ kmCalc
 		{'code': 'en', 'name':'English'}, 
 		{'code': 'nl', 'name': 'Nederlands'}
 		]
-	})
+})
 
 .run(function(user){
 	user.load().then(function(userData){

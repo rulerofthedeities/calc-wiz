@@ -7,6 +7,29 @@
     		<li><a href="#/exercises/division"><span class="icon">&#xf7;</span> <span translate="content">Division</span></a></li>
     	</ul>
     </li>  
-    <li><a href="#"><i class="fa fa-circle-o"></i> <span translate="content">Venn Diagrams</span></a></li>
-    <li><a href="#"><i class="fa fa-sort-numeric-asc"></i>  <span translate="content">Number Knowledge</span></a></li>
+    <li class="disabled">
+        <a href="#" ng-click="$event.preventDefault()">
+            <i class="fa fa-circle-o"></i> 
+            <span translate="content">Venn Diagrams</span>
+        </a>
+    </li>
+    <li class="disabled">
+        <a href="#" ng-click="$event.preventDefault()" class="inactive">
+            <i class="fa fa-sort-numeric-asc"></i>  
+            <span translate="content">Number Knowledge</span>
+        </a>
+    </li>
+    <li class="nav-divider"></li>
+    <li>
+        <a href="#/results">
+            <i class="fa fa-file-o"></i> 
+            <span translate="content">Results</span>
+        </a>
+    </li>
+    <li>
+        <a href="#/config">
+            <i class="fa fa-wrench"></i> 
+            <span translate="content">Configuration</span>
+        </a>
+    </li>
 </ul>
