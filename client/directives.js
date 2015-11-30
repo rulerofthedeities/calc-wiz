@@ -219,6 +219,7 @@
 							'elapseTime' : Date.now() - startTime
 						},
 						correct = calcExercise.checkAnswer()(answer, correctAnswer);
+					
 					results.addResult({
 						nr: this.nr,
 						question: this.question, 
@@ -228,6 +229,7 @@
 							correct: correct
 						}
 					});
+
 					this.correct[this.nr - 1] = correct.all;
 
 					if (correct.all){

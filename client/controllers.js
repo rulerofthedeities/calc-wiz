@@ -57,9 +57,10 @@
 	})
 
 	.controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter, user, kmTranslate){
-		var resultsTable;
+		var resultsTable,
+			self = this;
 
-		getResultsTable = function(){
+		this.getResultsTable = function(){
 			var serverFilter = {
 				'user':user.getUserName(),
 				'completed':$scope.filter.completed
@@ -82,7 +83,7 @@
 		};
 
 		$scope.updateFilter = function(){
-			getResultsTable();
+			self.getResultsTable();
 		};
 
 		$scope.showDetailResult = function(indx){
@@ -119,10 +120,10 @@
 
 		$scope.$on('user:updated', function(event, data) {
 			$scope.userName = data.name;
-			getResultsTable();
+			self.getResultsTable();
 		});
 
-		getResultsTable();
+		this.getResultsTable();
 
 	});
 

@@ -11,7 +11,7 @@ var findResultDocs = function(db, filter, callback) {
 			questions:true,
 			user:true
 		},
-		cursor = db.collection('results').find(filter, fields);
+		cursor = db.collection('results').find(filter, fields).sort({"timing.started":-1}) ;
 
 	cursor.each(function(err, doc) {
 		assert.equal(err, null);
@@ -26,7 +26,7 @@ var findResultDocs = function(db, filter, callback) {
 var saveResultDoc = function(db, data, callback){
 	var collection = db.collection('results');
 	
-	collection.insert(data, function (err, result){
+	collection.insertOne(data, function (err, result){
 		assert.equal(err, null);
 		callback(result);
 	});

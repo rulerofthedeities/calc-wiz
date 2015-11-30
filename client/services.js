@@ -299,7 +299,7 @@
 		this.addResult = function(newResult){
 			var result = angular.copy(newResult);
 
-			delete result.question.helpFields;
+			result.question.helpers.helpFields = undefined;
 
 			results.questions.push(result);
 		};
@@ -358,6 +358,5 @@
 
 		};
 	});
-
 
 })( angular, kmCalc );

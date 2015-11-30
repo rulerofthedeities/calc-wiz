@@ -23,6 +23,7 @@ var gulp = require('gulp'),
 		config.bowerDir + '/bootstrap/fonts/**.*'];
 
 	clientJS = [
+		'client.js',
 		'client/**.js'];
 
 gulp.task('vendor_scripts', function() {
@@ -48,7 +49,16 @@ gulp.task('vendor_fonts', function() {
 		.pipe(gulp.dest('public/fonts'));
 });
 
-gulp.watch('client/*.js', ['client_scripts']);
 
-gulp.task('default', ['vendor_scripts', 'client_scripts', 'vendor_styles', 'vendor_fonts']);
+gulp.task('watch', function() {
+  gulp.watch('client.js', ['client_scripts']);
+  gulp.watch('client/*.js', ['client_scripts']);
+});
+
+gulp.task('default', [
+	'vendor_scripts', 
+	'client_scripts', 
+	'vendor_styles', 
+	'vendor_fonts', 
+	'watch']);
 

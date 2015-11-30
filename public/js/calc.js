@@ -1,4 +1,9 @@
-var kmCalc = angular.module("kmCalc", ['ngRoute', 'ui.bootstrap', 'km.translate', 'mediaPlayer', 'ngAnimate'])
+var kmCalc = angular.module("kmCalc", [
+	'ngRoute', 
+	'ui.bootstrap', 
+	'km.translate', 
+	'mediaPlayer', 
+	'ngAnimate']);
 
 kmCalc
 .constant("DEFAULTS",{	
@@ -7,34 +12,6 @@ kmCalc
 		{'code': 'en', 'name':'English'}, 
 		{'code': 'nl', 'name': 'Nederlands'}
 		]
-	})
-
-.config(function($routeProvider){
-	var translationResolve = ['kmTranslateFile', 
-  		function(kmTranslateFile){
-			return kmTranslateFile.promise(); 
-	}],
-
-	customRouteProvider = angular.extend({}, $routeProvider, {
-		when: function(path, route) {
-			route.resolve = (route.resolve) ? route.resolve : {};
-			angular.extend(route.resolve, translationResolve);
-			$routeProvider.when(path, route);
-			this.$inject = ['path', 'route'];
-			return this;
-		}
-	});
-
-	customRouteProvider.when('/', {
-		templateUrl: 'views/menu.htm' 
-	}).when('/exercises/:type', {
-		templateUrl: 'views/exercises.htm',
-		controller:'exercisesCtrl'
-	}).when('/results', {
-		templateUrl: 'views/results.htm'
-	}).when('/config', {
-		templateUrl: 'views/configuration.htm'
-	}).otherwise({redirectTo: '/'});
 })
 
 .run(function(user){
@@ -44,470 +21,6 @@ kmCalc
 			user.login(userData);
 		}
 	});
-})
-
-
-
-.filter('msToTime', function () {
-	return function (input) {
-		var sec = parseInt(input / 1000, 10);
-		if (isNaN(sec)) return "00:00:00";
-
-		var hours = Math.floor(sec / 3600),
-			minutes = Math.floor((sec - (hours * 3600)) / 60),
-			seconds = sec - (hours * 3600) - (minutes * 60);
-
-		return [("0" + hours).substr(-2), ("0" + minutes).substr(-2), ("0" + seconds).substr(-2)].join(":");
-	};
-})
-
-.controller("exercisesCtrl", function($scope, $routeParams, utils){
-	$scope.type = $routeParams.type;
-	$scope.title = utils.capitalizeFirstLetter($routeParams.type);
-})
-
-.controller("loginCtrl", function($scope, $uibModal, user){
-
-	var data = {};
-	//data.email = "test@yahoo.com";
-	data.name = $scope.userName;
-
-	$scope.openModal = function (size) {
-		var modalInstance = $uibModal.open({
-			animation: true,
-			scope: $scope.$new(true),
-			templateUrl: 'views/login.htm',
-			controller: 'modalLoginCtrl', 
-			size: size || 'md',
-			resolve: {
-				data: function () {
-					return data;
-				}
-			}
-		});
-		modalInstance.result.then(function (loginData) {
-	     	if (loginData.name){
-	     		user.login(loginData);
-	     	}
-	    }, function () {
-	    	//Modal closed
-	    });
-  	};
-
-  	$scope.logOut = function(){
-  		$scope.userName = user.logout();
-  	};
-})
-
-.controller('modalLoginCtrl', function ($scope, $uibModalInstance, data) {
-
-	$scope.ok = function (isValid) {
-		if (isValid){
-			$uibModalInstance.close($scope.login);
-		} else {
-			$scope.showError = true;
-		}
-	};
-
-	$scope.cancel = function () {
-		$uibModalInstance.dismiss('cancel');
-	};
-})
-
-.controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter, user, kmTranslate){
-	var resultsTable;
-
-	getResultsTable = function(){
-		var serverFilter = {
-			'user':user.getUserName(),
-			'completed':$scope.filter.completed
-		};
-		results.fetchAllResults(serverFilter, function(resultsArr){
-			//format in controller since filters are slow in repeats
-			angular.forEach(resultsArr, function(result){
-				result.tpe = kmTranslate.translate(utils.capitalizeFirstLetter(result.tpe));
-				result.name = result.user.name;
-				result.timing.elapse = msToTimeFilter(result.timing.elapse);
-				result.started = $filter('date')(result.timing.started, "dd/MM/yy HH:mm");
-				result.timing.completed = result.timing.interrupted ? kmTranslate.translate("No") : kmTranslate.translate("Yes");
-				result.totals.correct = result.totals.correct + '/' + result.totals.nrOfQuestions;
-				result.totals.percentage = Math.round(result.totals.percentage);
-				result.perfect = result.totals.percentage == 100;
-			});
-			$scope.resultsTable = resultsArr;
-			resultsTable = resultsArr;
-		});
-	};
-
-	$scope.updateFilter = function(){
-		getResultsTable();
-	};
-
-	$scope.showDetailResult = function(indx){
-		$scope.currentInsert = $scope.currentInsert == indx ? null : indx;
-		$scope.detailResult = [];
-		$scope.detailResult[indx] = resultsTable[indx];
-	};
-
-	$scope.userName = user.getUserName();
-	//initialize filter
-	$scope.filter = {
-		completed: true,
-		tpes: [
-			{val: "", name: kmTranslate.translate("All Exercises")},
-			{val: kmTranslate.translate("Addition")},
-			{val: kmTranslate.translate("Subtraction")},
-			{val: kmTranslate.translate("Multiplication")},
-			{val: kmTranslate.translate("Division")}]
-	};
-	$scope.filterLabels = {
-		completed: kmTranslate.translate("Completed only"),
-		type: kmTranslate.translate("Type"),
-		date: kmTranslate.translate("Date")
-	};
-	$scope.tableHeaders = {
-		name: kmTranslate.translate("Name"),
-		tpe: kmTranslate.translate("Type"),
-		start: kmTranslate.translate("Start"),
-		correct: kmTranslate.translate("Correct"),
-		perc: kmTranslate.translate("Percentage"),
-		time: kmTranslate.translate("Elapse Time"),
-		completed: kmTranslate.translate("Completed")
-	};
-
-	$scope.$on('user:updated', function(event, data) {
-		$scope.userName = data.name;
-		getResultsTable();
-	});
-
-	getResultsTable();
-
-})
-
-
-.directive("datePicker", function(DEFAULTS, kmTranslate){
-	return{
-		restrict:'E',
-		templateUrl: DEFAULTS.templateDir + 'datepicker.htm',
-		controller: 
-		function ($scope, $filter) {
-			$scope.labels = {
-				main: kmTranslate.translate("Date"),
-				close: kmTranslate.translate("Close"),
-				today: kmTranslate.translate("Today"),
-				clear: kmTranslate.translate("Clear")
-			};
-			
-			$scope.today = function() {
-				$scope.dt = new Date();
-			};
-
-			$scope.clear = function () {
-				$scope.dt = null;
-			};
-			$scope.clear();
-
-			$scope.maxDate = new Date();
-
-			$scope.open = function($event) {
-				$scope.status.opened = true;
-			};
-
-			$scope.dateOptions = {
-				formatYear: 'yy',
-				startingDay: 1
-			};
-
-			$scope.formats = ['dd/MM/yy'];
-			$scope.format = $scope.formats[0];
-
-			$scope.status = {
-				opened: false
-			};
-
-		    $scope.$watch('dt', function(newDt, oldDt) {
-				if (oldDt !== newDt){
-					$scope.filterDt = $filter('date')(newDt, "dd/MM/yy");
-				}
-			});
-		}
-	};
-})
-
-.directive("calcAudio", function(DEFAULTS, settings){
-	return{
-		restrict: 'E',
-		templateUrl: DEFAULTS.templateDir + 'audio.htm',
-		controller: function($scope){
-			$scope.playSound = function (sound) {
-				var audio = $scope[sound];
-				audio.playPause();
-			};
-			$scope.$on('audio', function(event, args) {
-				if (settings.general.audio){
-					$scope.playSound(args.sound);
-				}
-			});
-		}
-	};
-})
-
-.directive("calcMenu", function(DEFAULTS){
-	return{
-		restrict: 'E',
-		replace: true,
-		templateUrl: DEFAULTS.templateDir + 'menu.htm',
-		controller: function($scope){
-			$scope.isMenuCollapsed = false;
-		}
-	};
-})
-
-.directive("calcHeader", function(DEFAULTS, user){
-	return{
-		restrict: 'E',
-		replace: true,
-		scope: {title: '@'},
-		templateUrl: DEFAULTS.templateDir + 'header.htm',
-		controller: function($scope){
-			$scope.isHeaderCollapsed = true;
-			$scope.userName = user.getUserName();
-			$scope.$on('user:updated', function(event, data) {
-				$scope.userName = data.name;
-			});
-		}
-	};
-})
-
-.directive("calcConfig", function(config, settings, DEFAULTS, kmTranslate, kmTranslateConfig){
-	return{
-		restrict: 'E',
-		replace: true,
-		scope: {},
-		templateUrl: DEFAULTS.templateDir + 'config.htm',
-		controllerAs: 'config',
-		controller: function($scope){
-			this.range = settings.range;
-			this.general = settings.general;
-			this.updateConfig = function(){
-				if (config.saveConfigFile()){
-					this.msg = kmTranslate.translate("Your changes have been submitted");
-					kmTranslateConfig.setCurrentLanguage(settings.general.language);
-					$scope.configForm.$setPristine();
-				}
-			};
-			this.labels = {
-				"language": kmTranslate.translate("Language"),
-				"questions": kmTranslate.translate("No of questions"),
-				"audio": kmTranslate.translate("Audio"),
-				"total": kmTranslate.translate("Total"),
-				"term": kmTranslate.translate("Term"),
-				"min": kmTranslate.translate("min"),
-				"max": kmTranslate.translate("max"),
-				"remainder": kmTranslate.translate("Remainder")
-			};
-			
-		},
-		link: function(scope, element, attr) {
-			scope.$watch('config.general.language', function(newLan, oldLan) {
-				if (oldLan !== newLan){
-					kmTranslateConfig.setCurrentLanguage(newLan);
-				}
-			});
-
-		}
-	};
-})
-
-.directive("lanSelect", function(DEFAULTS){
-	return{
-		templateUrl: DEFAULTS.templateDir + 'lanselect.htm',
-		controller: function($scope){
-			$scope.config.languages = DEFAULTS.languages;
-		}
-	};
-})
-
-.directive("panelView", function(){
-	return{
-		controller: function($scope){ 
-			$scope.subview = "question";
-			$scope.changeView = function(newView){
-				$scope.subview = newView;
-			};
-		}
-	};
-})
-
-.directive('caret', function() {
-
-    function setCaretPosition(elem, caretPos) {
-        if (elem !== null) {
-            if (elem.createTextRange) {
-                var range = elem.createTextRange();
-                range.move('character', caretPos);
-                range.select();
-            } else {
-                if (elem.selectionStart) {
-                    elem.focus();
-                    elem.setSelectionRange(caretPos, caretPos);
-                }
-            }
-        }
-    }
-
-    return {
-        link: function(scope, element, attrs) {
-            var caret = Number(attrs.caret),
-            	field = attrs.ngModel;
-            if (field){
-	            scope.$watch(field, function(newValue, oldValue) {
-	                if (newValue && newValue != oldValue && !isNaN(newValue) ) {
-	                    setCaretPosition(element[0], caret);
-	                }
-	            });
-        	}
-        }
-    };
-})
-
-
-.directive("calcExercise", function(DEFAULTS, kmTranslate, setFocus){
-
-	return {
-		restrict: 'E',
-		replace: true,
-		templateUrl: DEFAULTS.templateDir + 'exercise.htm',
-		scope: {type:'@'},
-    	bindToController: true,
-    	controllerAs: 'ctrl',
-		controller: function($scope, exercise, settings, results){
-			var calcExercise = exercise.createExercise(this.type),
-				correctAnswer,
-				startTime;
-
-			this.init = function(){
-				this.question = calcExercise.questions[this.nr - 1];
-				this.userAnswer = "";
-				correctAnswer = calcExercise.answers[this.nr - 1];
-				startTime = Date.now();
-				this.isCorrectAnswer = {'answer': true, 'remainder': true, 'all': true};
-				this.setFocus = true;
-			};
-
-			this.submitAnswer = function(){
-				var answer = {
-						'answer': this.userAnswer, 
-						'remainder': this.question.remainder,
-						'elapseTime' : Date.now() - startTime
-					},
-					correct = calcExercise.checkAnswer()(answer, correctAnswer);
-				results.addResult({
-					nr: this.nr,
-					question: this.question, 
-					answer: {
-						userAnswer: answer, 
-						correctAnswer: correctAnswer, 
-						correct: correct
-					}
-				});
-				this.correct[this.nr - 1] = correct.all;
-
-				if (correct.all){
-					$scope.$emit('audio', {'sound':'ok'});
-					this.nextQuestion();
-				} else {
-					$scope.$emit('audio', {'sound':'nok'});
-					this.isCorrectAnswer = correct;
-					this.correctAnswer = correctAnswer;
-					setFocus('wrongnext');
-				}
-			};
-
-			this.nextQuestion = function(){
-				if (this.nr < this.maxNr){
-					this.nr++;
-					this.init();
-				} else {
-					calcExercise.exerciseCompleted();
-					this.results = results.getResults(calcExercise);
-					this.subview = "results";
-					if (this.results.totals.percentage == 100){
-						$scope.$emit('audio', {'sound':'cheer'});
-					}
-				}
-			};
-
-			this.nr = 1;
-			this.subview = "question";
-			this.subviewType = this.type === "addition" || this.type === "subtraction" ? "addsub" : this.type;
-			this.maxNr = settings.general.nrOfQuestions;
-			this.correct = [];
-			this.btnMessageCorrect = kmTranslate.translate(settings.btnMessage.active);
-			this.btnMessageIncorrect = kmTranslate.translate(settings.btnMessage.inActive);
-			
-			results.init(calcExercise);
-			this.init();
-		}
-	};
-})
-
-.directive('autoFocus', function() {
-    return {
-        restrict: 'AC',
-        scope: {setFocus:'=setfocus'},
-        link: function(scope, element, attr) {
-        	scope.$watch('setFocus', function() {
-				element[0].focus();
-				scope.setFocus = false;
-			});
-        }
-    };
-})
-
-.directive('parseInput', function(utils) {
-	return function(scope, element, attr) {
-		element[0].onkeydown = function(event) {
-			var key = event.keyCode || event.charCode,
-				validKeys = [189, 13, 8];
-
-			//Only digits or special characters
-			if ((key < 96 || key > 105) && !utils.isInArray(validKeys, key)){
-				//invalid key
-				event.preventDefault();
-			}
-			if (attr.fixBackspace !== undefined){
-				//Remove last entered digit if backspace key is pressed
-				var no = this.value.toString(),
-					newno = "";
-				for (var i = no.length - 1; i > 0; i--){
-					newno = no[i] + newno;
-				}
-				newno += ' ';
-				if (key === 8){
-					this.value = newno;
-				}
-			}
-		};
-	};
-})
-
-.directive('exerciseProgress', function(DEFAULTS) {
-    return {
-        restrict: 'E',
-        replace: true,
-        scope: {correct:'='},
-        templateUrl: DEFAULTS.templateDir + 'progress.htm'
-    };
-})
-
-.directive('exerciseResults', function(DEFAULTS) {
-	return {
-		restrict: 'E',
-		replace: true,
-		scope: {results:'=', showHeader:'='}, 
-		templateUrl: DEFAULTS.templateDir + 'result.htm'
-	};
 });
 
 //Load json files and bootstrap
@@ -540,6 +53,523 @@ angular.element(document).ready(function () {
 });
 
 
+(function(ng, app){
+	
+	"use strict";
+
+	app
+	.config(function($routeProvider){
+		var translationResolve = ['kmTranslateFile', 
+			function(kmTranslateFile){
+				return kmTranslateFile.promise(); 
+		}],
+
+		customRouteProvider = angular.extend({}, $routeProvider, {
+			when: function(path, route) {
+				route.resolve = (route.resolve) ? route.resolve : {};
+				angular.extend(route.resolve, translationResolve);
+				$routeProvider.when(path, route);
+				this.$inject = ['path', 'route'];
+				return this;
+			}
+		});
+
+		customRouteProvider.when('/', {
+			templateUrl: 'views/menu.htm' 
+		}).when('/exercises/:type', {
+			templateUrl: 'views/exercises.htm',
+			controller:'exercisesCtrl'
+		}).when('/results', {
+			templateUrl: 'views/results.htm'
+		}).when('/config', {
+			templateUrl: 'views/configuration.htm'
+		}).otherwise({redirectTo: '/'});
+	});
+
+})(angular, kmCalc);
+(function(ng, app){
+	
+	"use strict";
+
+	app
+	.controller("exercisesCtrl", function($scope, $routeParams, utils){
+		$scope.type = $routeParams.type;
+		$scope.title = utils.capitalizeFirstLetter($routeParams.type);
+	})
+
+	.controller("loginCtrl", function($scope, $uibModal, user){
+
+		var data = {};
+		//data.email = "test@yahoo.com";
+		data.name = $scope.userName;
+
+		$scope.openModal = function (size) {
+			var modalInstance = $uibModal.open({
+				animation: true,
+				scope: $scope.$new(true),
+				templateUrl: 'views/login.htm',
+				controller: 'modalLoginCtrl', 
+				size: size || 'md',
+				resolve: {
+					data: function () {
+						return data;
+					}
+				}
+			});
+			modalInstance.result.then(function (loginData) {
+		     	if (loginData.name){
+		     		user.login(loginData);
+		     	}
+		    }, function () {
+		    	//Modal closed
+		    });
+	  	};
+
+	  	$scope.logOut = function(){
+	  		$scope.userName = user.logout();
+	  	};
+	})
+
+	.controller('modalLoginCtrl', function ($scope, $uibModalInstance, data) {
+
+		$scope.ok = function (isValid) {
+			if (isValid){
+				$uibModalInstance.close($scope.login);
+			} else {
+				$scope.showError = true;
+			}
+		};
+
+		$scope.cancel = function () {
+			$uibModalInstance.dismiss('cancel');
+		};
+	})
+
+	.controller('resultsCtrl', function($scope, $filter, utils, results, msToTimeFilter, user, kmTranslate){
+		var resultsTable,
+			self = this;
+
+		this.getResultsTable = function(){
+			var serverFilter = {
+				'user':user.getUserName(),
+				'completed':$scope.filter.completed
+			};
+			results.fetchAllResults(serverFilter, function(resultsArr){
+				//format in controller since filters are slow in repeats
+				angular.forEach(resultsArr, function(result){
+					result.tpe = kmTranslate.translate(utils.capitalizeFirstLetter(result.tpe));
+					result.name = result.user.name;
+					result.timing.elapse = msToTimeFilter(result.timing.elapse);
+					result.started = $filter('date')(result.timing.started, "dd/MM/yy HH:mm");
+					result.timing.completed = result.timing.interrupted ? kmTranslate.translate("No") : kmTranslate.translate("Yes");
+					result.totals.correct = result.totals.correct + '/' + result.totals.nrOfQuestions;
+					result.totals.percentage = Math.round(result.totals.percentage);
+					result.perfect = result.totals.percentage == 100;
+				});
+				$scope.resultsTable = resultsArr;
+				resultsTable = resultsArr;
+			});
+		};
+
+		$scope.updateFilter = function(){
+			self.getResultsTable();
+		};
+
+		$scope.showDetailResult = function(indx){
+			$scope.currentInsert = $scope.currentInsert == indx ? null : indx;
+			$scope.detailResult = [];
+			$scope.detailResult[indx] = resultsTable[indx];
+		};
+
+		$scope.userName = user.getUserName();
+		//initialize filter
+		$scope.filter = {
+			completed: true,
+			tpes: [
+				{val: "", name: kmTranslate.translate("All Exercises")},
+				{val: kmTranslate.translate("Addition")},
+				{val: kmTranslate.translate("Subtraction")},
+				{val: kmTranslate.translate("Multiplication")},
+				{val: kmTranslate.translate("Division")}]
+		};
+		$scope.filterLabels = {
+			completed: kmTranslate.translate("Completed only"),
+			type: kmTranslate.translate("Type"),
+			date: kmTranslate.translate("Date")
+		};
+		$scope.tableHeaders = {
+			name: kmTranslate.translate("Name"),
+			tpe: kmTranslate.translate("Type"),
+			start: kmTranslate.translate("Start"),
+			correct: kmTranslate.translate("Correct"),
+			perc: kmTranslate.translate("Percentage"),
+			time: kmTranslate.translate("Elapse Time"),
+			completed: kmTranslate.translate("Completed")
+		};
+
+		$scope.$on('user:updated', function(event, data) {
+			$scope.userName = data.name;
+			self.getResultsTable();
+		});
+
+		this.getResultsTable();
+
+	});
+
+})(angular, kmCalc);
+(function(ng, app){
+
+	"use strict";
+
+	app
+	.directive("datePicker", function(DEFAULTS, kmTranslate){
+		return{
+			restrict:'E',
+			templateUrl: DEFAULTS.templateDir + 'datepicker.htm',
+			controller: 
+			function ($scope, $filter) {
+				$scope.labels = {
+					main: kmTranslate.translate("Date"),
+					close: kmTranslate.translate("Close"),
+					today: kmTranslate.translate("Today"),
+					clear: kmTranslate.translate("Clear")
+				};
+				
+				$scope.today = function() {
+					$scope.dt = new Date();
+				};
+
+				$scope.clear = function () {
+					$scope.dt = null;
+				};
+				$scope.clear();
+
+				$scope.maxDate = new Date();
+
+				$scope.open = function($event) {
+					$scope.status.opened = true;
+				};
+
+				$scope.dateOptions = {
+					formatYear: 'yy',
+					startingDay: 1
+				};
+
+				$scope.formats = ['dd/MM/yy'];
+				$scope.format = $scope.formats[0];
+
+				$scope.status = {
+					opened: false
+				};
+
+			    $scope.$watch('dt', function(newDt, oldDt) {
+					if (oldDt !== newDt){
+						$scope.filterDt = $filter('date')(newDt, "dd/MM/yy");
+					}
+				});
+			}
+		};
+	})
+
+	.directive("calcAudio", function(DEFAULTS, settings){
+		return{
+			restrict: 'E',
+			templateUrl: DEFAULTS.templateDir + 'audio.htm',
+			controller: function($scope){
+				$scope.playSound = function (sound) {
+					var audio = $scope[sound];
+					audio.playPause();
+				};
+				$scope.$on('audio', function(event, args) {
+					if (settings.general.audio){
+						$scope.playSound(args.sound);
+					}
+				});
+			}
+		};
+	})
+
+	.directive("calcMenu", function(DEFAULTS){
+		return{
+			restrict: 'E',
+			replace: true,
+			templateUrl: DEFAULTS.templateDir + 'menu.htm',
+			controller: function($scope){
+				$scope.isMenuCollapsed = false;
+			}
+		};
+	})
+
+	.directive("calcHeader", function(DEFAULTS, user){
+		return{
+			restrict: 'E',
+			replace: true,
+			scope: {title: '@'},
+			templateUrl: DEFAULTS.templateDir + 'header.htm',
+			controller: function($scope){
+				$scope.isHeaderCollapsed = true;
+				$scope.userName = user.getUserName();
+				$scope.$on('user:updated', function(event, data) {
+					$scope.userName = data.name;
+				});
+			}
+		};
+	})
+
+	.directive("calcConfig", function(config, settings, DEFAULTS, kmTranslate, kmTranslateConfig){
+		return{
+			restrict: 'E',
+			replace: true,
+			templateUrl: DEFAULTS.templateDir + 'config.htm',
+			controllerAs: 'config',
+			controller: function($scope){
+				this.range = settings.range;
+				this.general = settings.general;
+				this.updateConfig = function(){
+					if (config.saveConfigFile()){
+						this.msg = kmTranslate.translate("Your changes have been submitted");
+						kmTranslateConfig.setCurrentLanguage(settings.general.language);
+						$scope.configForm.$setPristine();
+					}
+				};
+				this.labels = {
+					"language": kmTranslate.translate("Language"),
+					"questions": kmTranslate.translate("No of questions"),
+					"audio": kmTranslate.translate("Audio"),
+					"total": kmTranslate.translate("Total"),
+					"term": kmTranslate.translate("Term"),
+					"min": kmTranslate.translate("min"),
+					"max": kmTranslate.translate("max"),
+					"remainder": kmTranslate.translate("Remainder")
+				};
+				
+			},
+			link: function(scope, element, attr) {
+				scope.$watch('config.general.language', function(newLan, oldLan) {
+					if (oldLan !== newLan){
+						kmTranslateConfig.setCurrentLanguage(newLan);
+					}
+				});
+
+			}
+		};
+	})
+
+	.directive("lanSelect", function(DEFAULTS){
+		return{
+			templateUrl: DEFAULTS.templateDir + 'lanselect.htm',
+			controller: function($scope){
+				$scope.config.languages = DEFAULTS.languages;
+			}
+		};
+	})
+
+	.directive("panelView", function(){
+		return{
+			controller: function($scope){ 
+				$scope.subview = "question";
+				$scope.changeView = function(newView){
+					$scope.subview = newView;
+				};
+			}
+		};
+	})
+
+	.directive('caret', function() {
+
+	    function setCaretPosition(elem, caretPos) {
+	        if (elem !== null) {
+	            if (elem.createTextRange) {
+	                var range = elem.createTextRange();
+	                range.move('character', caretPos);
+	                range.select();
+	            } else {
+	                if (elem.selectionStart) {
+	                    elem.focus();
+	                    elem.setSelectionRange(caretPos, caretPos);
+	                }
+	            }
+	        }
+	    }
+
+	    return {
+	        link: function(scope, element, attrs) {
+	            var caret = Number(attrs.caret),
+	            	field = attrs.ngModel;
+	            if (field){
+		            scope.$watch(field, function(newValue, oldValue) {
+		                if (newValue && newValue != oldValue && !isNaN(newValue) ) {
+		                    setCaretPosition(element[0], caret);
+		                }
+		            });
+	        	}
+	        }
+	    };
+	})
+
+
+	.directive("calcExercise", function(DEFAULTS, kmTranslate, setFocus){
+
+		return {
+			restrict: 'E',
+			replace: true,
+			templateUrl: DEFAULTS.templateDir + 'exercise.htm',
+			scope: {type:'@'},
+	    	bindToController: true,
+	    	controllerAs: 'ctrl',
+			controller: function($scope, exercise, settings, results){
+				var calcExercise = exercise.createExercise(this.type),
+					correctAnswer,
+					startTime;
+
+				this.init = function(){
+					this.question = calcExercise.questions[this.nr - 1];
+					this.userAnswer = "";
+					correctAnswer = calcExercise.answers[this.nr - 1];
+					startTime = Date.now();
+					this.isCorrectAnswer = {'answer': true, 'remainder': true, 'all': true};
+					this.setFocus = true;
+				};
+
+				this.submitAnswer = function(){
+					var answer = {
+							'answer': this.userAnswer, 
+							'remainder': this.question.remainder,
+							'elapseTime' : Date.now() - startTime
+						},
+						correct = calcExercise.checkAnswer()(answer, correctAnswer);
+					
+					results.addResult({
+						nr: this.nr,
+						question: this.question, 
+						answer: {
+							userAnswer: answer, 
+							correctAnswer: correctAnswer, 
+							correct: correct
+						}
+					});
+
+					this.correct[this.nr - 1] = correct.all;
+
+					if (correct.all){
+						$scope.$emit('audio', {'sound':'ok'});
+						this.nextQuestion();
+					} else {
+						$scope.$emit('audio', {'sound':'nok'});
+						this.isCorrectAnswer = correct;
+						this.correctAnswer = correctAnswer;
+						setFocus('wrongnext');
+					}
+				};
+
+				this.nextQuestion = function(){
+					if (this.nr < this.maxNr){
+						this.nr++;
+						this.init();
+					} else {
+						calcExercise.exerciseCompleted();
+						this.results = results.getResults(calcExercise);
+						this.subview = "results";
+						if (this.results.totals.percentage == 100){
+							$scope.$emit('audio', {'sound':'cheer'});
+						}
+					}
+				};
+
+				this.nr = 1;
+				this.subview = "question";
+				this.subviewType = this.type === "addition" || this.type === "subtraction" ? "addsub" : this.type;
+				this.maxNr = settings.general.nrOfQuestions;
+				this.correct = [];
+				this.btnMessageCorrect = kmTranslate.translate(settings.btnMessage.active);
+				this.btnMessageIncorrect = kmTranslate.translate(settings.btnMessage.inActive);
+				
+				results.init(calcExercise);
+				this.init();
+			}
+		};
+	})
+
+	.directive('autoFocus', function() {
+	    return {
+	        restrict: 'AC',
+	        scope: {setFocus:'=setfocus'},
+	        link: function(scope, element, attr) {
+	        	scope.$watch('setFocus', function() {
+					element[0].focus();
+					scope.setFocus = false;
+				});
+	        }
+	    };
+	})
+
+	.directive('parseInput', function(utils) {
+		return function(scope, element, attr) {
+			element[0].onkeydown = function(event) {
+				var key = event.keyCode || event.charCode,
+					validKeys = [189, 13, 8];
+
+				//Only digits or special characters
+				if ((key < 96 || key > 105) && !utils.isInArray(validKeys, key)){
+					//invalid key
+					event.preventDefault();
+				}
+				if (attr.fixBackspace !== undefined){
+					//Remove last entered digit if backspace key is pressed
+					var no = this.value.toString(),
+						newno = "";
+					for (var i = no.length - 1; i > 0; i--){
+						newno = no[i] + newno;
+					}
+					newno += ' ';
+					if (key === 8){
+						this.value = newno;
+					}
+				}
+			};
+		};
+	})
+
+	.directive('exerciseProgress', function(DEFAULTS) {
+	    return {
+	        restrict: 'E',
+	        replace: true,
+	        scope: {correct:'='},
+	        templateUrl: DEFAULTS.templateDir + 'progress.htm'
+	    };
+	})
+
+	.directive('exerciseResults', function(DEFAULTS) {
+		return {
+			restrict: 'E',
+			replace: true,
+			scope: {results:'=', showHeader:'='}, 
+			templateUrl: DEFAULTS.templateDir + 'result.htm'
+		};
+	});
+	
+})(angular, kmCalc);
+
+(function(ng, app){
+	
+	"use strict";
+
+	app
+	.filter('msToTime', function () {
+		return function (input) {
+			var sec = parseInt(input / 1000, 10);
+			if (isNaN(sec)) return "00:00:00";
+
+			var hours = Math.floor(sec / 3600),
+				minutes = Math.floor((sec - (hours * 3600)) / 60),
+				seconds = sec - (hours * 3600) - (minutes * 60);
+
+			return [("0" + hours).substr(-2), ("0" + minutes).substr(-2), ("0" + seconds).substr(-2)].join(":");
+		};
+	});
+
+
+})(angular, kmCalc);
 (function( ng, app ) {
 	
 	"use strict";
@@ -841,7 +871,7 @@ angular.element(document).ready(function () {
 		this.addResult = function(newResult){
 			var result = angular.copy(newResult);
 
-			delete result.question.helpFields;
+			result.question.helpers.helpFields = undefined;
 
 			results.questions.push(result);
 		};
@@ -900,6 +930,5 @@ angular.element(document).ready(function () {
 
 		};
 	});
-
 
 })( angular, kmCalc );
