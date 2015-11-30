@@ -1,4 +1,4 @@
-var mongoClient = require('mongodb').MongoClient,
+var mongo = require('mongodb'),
 	assert = require("assert");
 
 var findResultDocs = function(db, filter, callback) {
@@ -35,14 +35,9 @@ var saveResultDoc = function(db, data, callback){
 module.exports = {
 	save: function(req, res){
 		var results_data = req.body;
-			
-		mongoClient.connect('mongodb://localhost:27017/calcwiz', function(err, db) {
-			assert.equal(null, err);
-
-			saveResultDoc(db, results_data, function(result){
-				res.status(200).send('Results saved');
-				db.close();
-			});
+		
+		saveResultDoc(mongo.DB, results_data, function(result){
+			res.status(200).send('Results saved');
 		});
 	},
 	retrieve: function(req, res){
@@ -53,14 +48,8 @@ module.exports = {
 			filter["timing.interrupted"] = false;
 		}
 		filter["user.name"] = query.user;
-
-		mongoClient.connect('mongodb://localhost:27017/calcwiz', function(err, db) {
-			assert.equal(null, err);
-
-			findResultDocs(db, filter, function(docs) {
-				res.status(200).send(docs);
-				db.close();
-			});
+		findResultDocs(mongo.DB, filter, function(docs) {
+			res.status(200).send(docs);
 		});
 	}
 };

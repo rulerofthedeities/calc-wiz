@@ -1,5 +1,5 @@
-var config = require('../server/controllers/config.js'),
-	results = require('../server/controllers/results.js');
+var config = require('../server/controllers/config'),
+	results = require('../server/controllers/results');
 
 module.exports.initialize = function(app, router) {
 
