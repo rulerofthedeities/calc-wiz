@@ -80,14 +80,14 @@
 	})
 
 	.service("config", function($http, $log, settings, configFileName){
-		this.saveConfigFile = function(){
+		this.saveConfigFile = function(callback){
+			var cb = callback;
 			$http.post('/config?file=' + encodeURI(configFileName), settings).then(function(){
 				$log.info("Saved file '" + configFileName + "'");
-				return true;
+				callback();
 			},
 			function(){
 				$log.error("Error saving file '" + configFileName + "'");
-				return false;
 			});
 		};
 	})

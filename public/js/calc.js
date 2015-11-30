@@ -326,11 +326,11 @@ angular.element(document).ready(function () {
 				this.range = settings.range;
 				this.general = settings.general;
 				this.updateConfig = function(){
-					if (config.saveConfigFile()){
-						this.msg = kmTranslate.translate("Your changes have been submitted");
+					config.saveConfigFile(function(){
+						$scope.config.msg = kmTranslate.translate("Your changes have been submitted");
 						kmTranslateConfig.setCurrentLanguage(settings.general.language);
 						$scope.configForm.$setPristine();
-					}
+					});
 				};
 				this.labels = {
 					"language": kmTranslate.translate("Language"),
@@ -652,14 +652,14 @@ angular.element(document).ready(function () {
 	})
 
 	.service("config", function($http, $log, settings, configFileName){
-		this.saveConfigFile = function(){
+		this.saveConfigFile = function(callback){
+			var cb = callback;
 			$http.post('/config?file=' + encodeURI(configFileName), settings).then(function(){
 				$log.info("Saved file '" + configFileName + "'");
-				return true;
+				callback();
 			},
 			function(){
 				$log.error("Error saving file '" + configFileName + "'");
-				return false;
 			});
 		};
 	})

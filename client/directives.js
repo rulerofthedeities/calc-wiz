@@ -107,11 +107,11 @@
 				this.range = settings.range;
 				this.general = settings.general;
 				this.updateConfig = function(){
-					if (config.saveConfigFile()){
-						this.msg = kmTranslate.translate("Your changes have been submitted");
+					config.saveConfigFile(function(){
+						$scope.config.msg = kmTranslate.translate("Your changes have been submitted");
 						kmTranslateConfig.setCurrentLanguage(settings.general.language);
 						$scope.configForm.$setPristine();
-					}
+					});
 				};
 				this.labels = {
 					"language": kmTranslate.translate("Language"),
