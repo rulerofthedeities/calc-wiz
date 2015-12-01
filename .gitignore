@@ -2,6 +2,7 @@
 source
 testresult.htm
 public/views/loginold.htm
+env.json
 
 # PSDs
 *.psd

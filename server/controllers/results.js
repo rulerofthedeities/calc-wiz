@@ -37,7 +37,7 @@ module.exports = {
 		var results_data = req.body;
 		
 		saveResultDoc(mongo.DB, results_data, function(result){
-			res.status(200).send('Results saved');
+			res.status(201).send('Results saved');
 		});
 	},
 	retrieve: function(req, res){
