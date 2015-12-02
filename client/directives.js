@@ -52,7 +52,7 @@
 		};
 	})
 
-	.directive("calcAudio", function(DEFAULTS, settings){
+	.directive("calcAudio", function(DEFAULTS, config){
 		return{
 			restrict: 'E',
 			templateUrl: DEFAULTS.templateDir + 'audio.htm',
@@ -62,7 +62,7 @@
 					audio.playPause();
 				};
 				$scope.$on('audio', function(event, args) {
-					if (settings.general.audio){
+					if (config.getSettings().general.audio){
 						$scope.playSound(args.sound);
 					}
 				});
@@ -97,17 +97,18 @@
 		};
 	})
 
-	.directive("calcConfig", function(config, settings, DEFAULTS, kmTranslate, kmTranslateConfig){
+	.directive("calcConfig", function(config, DEFAULTS, kmTranslate, kmTranslateConfig){
 		return{
 			restrict: 'E',
 			replace: true,
 			templateUrl: DEFAULTS.templateDir + 'config.htm',
 			controllerAs: 'config',
 			controller: function($scope){
+				var settings = config.getSettings();
 				this.range = settings.range;
 				this.general = settings.general;
 				this.updateConfig = function(){
-					config.saveConfigFile(function(){
+					config.saveSettings(function(){
 						$scope.config.msg = kmTranslate.translate("Your changes have been submitted");
 						kmTranslateConfig.setCurrentLanguage(settings.general.language);
 						$scope.configForm.$setPristine();
@@ -198,10 +199,11 @@
 			scope: {type:'@'},
 	    	bindToController: true,
 	    	controllerAs: 'ctrl',
-			controller: function($scope, exercise, settings, results){
+			controller: function($scope, exercise, config, results){
 				var calcExercise = exercise.createExercise(this.type),
 					correctAnswer,
-					startTime;
+					startTime,
+					settings = config.getSettings();
 
 				this.init = function(){
 					this.question = calcExercise.questions[this.nr - 1];

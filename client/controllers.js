@@ -8,7 +8,7 @@
 		$scope.title = utils.capitalizeFirstLetter($routeParams.type);
 	})
 
-	.controller("loginCtrl", function($scope, $uibModal, user){
+	.controller("loginCtrl", function($scope, $uibModal, user, config){
 
 		var data = {};
 		//data.email = "test@yahoo.com";
@@ -30,6 +30,7 @@
 			modalInstance.result.then(function (loginData) {
 		     	if (loginData.name){
 		     		user.login(loginData);
+		     		config.setSettings(loginData.name);
 		     	}
 		    }, function () {
 		    	//Modal closed

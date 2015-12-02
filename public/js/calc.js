@@ -5,15 +5,15 @@ var kmCalc = angular.module("kmCalc", [
 	'mediaPlayer', 
 	'ngAnimate']);
 
-kmCalc
-.constant("DEFAULTS",{	
+kmCalc.constant("DEFAULTS",{	
 	'templateDir': 'views/directives/',
 	'languages': [
 		{'code': 'en', 'name':'English'}, 
 		{'code': 'nl', 'name': 'Nederlands'}
 		]
-})
+});
 
+/*
 .run(function(user){
 	user.load().then(function(userData){
 		if (userData){
@@ -22,32 +22,49 @@ kmCalc
 		}
 	});
 });
+*/
 
 //Load json files and bootstrap
 angular.element(document).ready(function () {
 	var initInjector = angular.injector(['ng']),
 		$http = initInjector.get('$http'),
 		$log = initInjector.get('$log'),
-		jsonDir = "json/",
-		configFileName = "config.json",
-		translateFileName = "translate.json",
-		promise = $http.get(jsonDir + configFileName);
+		defaultUser = {"name": "demo"},
+		userKey = 'calc-wiz-user',
+		translateFileName = "json/translate.json",
+		promise = $http.get(translateFileName);
+
+	/** Loading Sequence
+		1. Load translation file.
+		2. Check if a local username is saved in local storage.
+		3. If not, use default user ('demo')
+		4. Load config settings for that user from db
+		5. If db entry does not exist , the default config file will be loaded (backend)
+	**/
 
 	promise.then(
-		function(configResponse){
-			$log.info("Configuration file '" + jsonDir + configFileName + "' loaded");
-
-			angular.module('kmCalc')
-				.value('settings', configResponse.data)
-				.value("configFileName", configFileName)
-				.config(['kmTranslateConfigProvider', function(kmTranslateConfigProvider){
-					kmTranslateConfigProvider.configSetCurrentLanguage(configResponse.data.general.language);
-					kmTranslateConfigProvider.configSetTranslationFile("json/translate.json", "lan");
-				}]);
+		function(translateResponse){
+			$log.info("Translation file '" + translateFileName + "' loaded");
+			var userData = localStorage.getItem(userKey);
+			userData = JSON.parse(userData) || defaultUser;
+			
+			$http.get('/config?usr=' + encodeURI(userData.name)).then(function(configResponse){
+				angular.module('kmCalc')
+					.config(['configProvider', function(configProvider){
+						configProvider.configSetSettings(configResponse.data);
+					}])
+					.config(['userProvider', function(userProvider){
+						userProvider.configSetUser(userData);
+					}])
+					.config(['kmTranslateConfigProvider', function(kmTranslateConfigProvider){
+						kmTranslateConfigProvider.configSetCurrentLanguage(configResponse.data.general.language);
+						kmTranslateConfigProvider.configSetTranslationFile(translateFileName, "lan");
+					}]);
 				angular.bootstrap(document, ['kmCalc'], true);
+			});
 		},
 		function(){
-			$log.error("Error loading configuration file '" + jsonDir + configFileName + "'");
+			$log.error("Error loading translation file '" + translateFileName + "'");
 		}
 	);
 });
@@ -59,11 +76,11 @@ angular.element(document).ready(function () {
 
 	app
 	.config(function($routeProvider){
+		/*
 		var translationResolve = ['kmTranslateFile', 
 			function(kmTranslateFile){
 				return kmTranslateFile.promise(); 
 		}],
-
 		customRouteProvider = angular.extend({}, $routeProvider, {
 			when: function(path, route) {
 				route.resolve = (route.resolve) ? route.resolve : {};
@@ -73,8 +90,9 @@ angular.element(document).ready(function () {
 				return this;
 			}
 		});
+*/
 
-		customRouteProvider.when('/', {
+		$routeProvider.when('/', {
 			templateUrl: 'views/menu.htm' 
 		}).when('/exercises/:type', {
 			templateUrl: 'views/exercises.htm',
@@ -97,7 +115,7 @@ angular.element(document).ready(function () {
 		$scope.title = utils.capitalizeFirstLetter($routeParams.type);
 	})
 
-	.controller("loginCtrl", function($scope, $uibModal, user){
+	.controller("loginCtrl", function($scope, $uibModal, user, config){
 
 		var data = {};
 		//data.email = "test@yahoo.com";
@@ -119,6 +137,7 @@ angular.element(document).ready(function () {
 			modalInstance.result.then(function (loginData) {
 		     	if (loginData.name){
 		     		user.login(loginData);
+		     		config.setSettings(loginData.name);
 		     	}
 		    }, function () {
 		    	//Modal closed
@@ -271,7 +290,7 @@ angular.element(document).ready(function () {
 		};
 	})
 
-	.directive("calcAudio", function(DEFAULTS, settings){
+	.directive("calcAudio", function(DEFAULTS, config){
 		return{
 			restrict: 'E',
 			templateUrl: DEFAULTS.templateDir + 'audio.htm',
@@ -281,7 +300,7 @@ angular.element(document).ready(function () {
 					audio.playPause();
 				};
 				$scope.$on('audio', function(event, args) {
-					if (settings.general.audio){
+					if (config.getSettings().general.audio){
 						$scope.playSound(args.sound);
 					}
 				});
@@ -316,17 +335,18 @@ angular.element(document).ready(function () {
 		};
 	})
 
-	.directive("calcConfig", function(config, settings, DEFAULTS, kmTranslate, kmTranslateConfig){
+	.directive("calcConfig", function(config, DEFAULTS, kmTranslate, kmTranslateConfig){
 		return{
 			restrict: 'E',
 			replace: true,
 			templateUrl: DEFAULTS.templateDir + 'config.htm',
 			controllerAs: 'config',
 			controller: function($scope){
+				var settings = config.getSettings();
 				this.range = settings.range;
 				this.general = settings.general;
 				this.updateConfig = function(){
-					config.saveConfigFile(function(){
+					config.saveSettings(function(){
 						$scope.config.msg = kmTranslate.translate("Your changes have been submitted");
 						kmTranslateConfig.setCurrentLanguage(settings.general.language);
 						$scope.configForm.$setPristine();
@@ -417,10 +437,11 @@ angular.element(document).ready(function () {
 			scope: {type:'@'},
 	    	bindToController: true,
 	    	controllerAs: 'ctrl',
-			controller: function($scope, exercise, settings, results){
+			controller: function($scope, exercise, config, results){
 				var calcExercise = exercise.createExercise(this.type),
 					correctAnswer,
-					startTime;
+					startTime,
+					settings = config.getSettings();
 
 				this.init = function(){
 					this.question = calcExercise.questions[this.nr - 1];
@@ -602,40 +623,52 @@ angular.element(document).ready(function () {
 		};
 	})
 
-	.factory("user", function($rootScope, $q, $timeout){
+	.provider("user", function(){
 		var defUser = {name:"demo"},
 			key = 'calc-wiz-user',
 			user = angular.copy(defUser);
-			
+
 		return {
-			getUserName: function(){
-				return user.name;
+			configSetUser: function(userData) {
+				if (userData){
+					user.name = userData.name;
+				}
 			},
-			getUser: function(){
-				return user;
-			},
-			login: function(newUser){
-				user.name = newUser.name;
-				$rootScope.$broadcast('user:updated', {'name':user.name});
-				this.save();
-			},
-			logout: function(){
-				user = angular.copy(defUser);
-				return user.name;
-			},
-			save: function(){
-				var toSave = {
-					'name': user.name
+			$get: function($injector) {
+				return {
+					getUserName: function(){
+						return user.name;
+					},
+					getUser: function(){
+						return user;
+					},
+					login: function(newUser){
+						user.name = newUser.name;
+
+						var rScope = $injector.get('$rootScope');  
+						rScope.$broadcast('user:updated', {'name':user.name});
+						this.save();
+					},
+					logout: function(){
+						user = angular.copy(defUser);
+						return user.name;
+					},
+					save: function(){
+						var toSave = {
+							'name': user.name
+						};
+						localStorage.setItem(key, JSON.stringify(toSave));
+					},
+					load: function(){
+						var q = $injector.get('$q'),
+							deferred = q.defer(),
+							userData = localStorage.getItem(key);
+
+						deferred.resolve(userData);
+
+						return deferred.promise;
+					}
 				};
-				localStorage.setItem(key, JSON.stringify(toSave));
-			},
-			load: function(){
-				var deferred = $q.defer();
-
-				var userData = localStorage.getItem(key);
-				deferred.resolve(userData);
-
-				return deferred.promise;
 			}
 		};
 	})
@@ -651,20 +684,45 @@ angular.element(document).ready(function () {
 		};
 	})
 
-	.service("config", function($http, $log, settings, configFileName){
-		this.saveConfigFile = function(callback){
-			var cb = callback;
-			$http.post('/config?file=' + encodeURI(configFileName), settings).then(function(){
-				$log.info("Saved file '" + configFileName + "'");
-				callback();
+	.provider("config", function(){
+		var settings = null;
+
+		return {
+			configSetSettings: function(newSettings) {
+				settings = newSettings;
 			},
-			function(){
-				$log.error("Error saving file '" + configFileName + "'");
-			});
+			$get: function($http, $log, user) {
+				return {
+					saveSettings: function(callback){
+						var requestData = {
+							"userName": user.getUserName(),
+							"settings": settings
+						};
+
+						$http.post('/config', requestData).then(function(){
+							callback();
+						},
+						function(){
+							$log.error("Error saving config settings.");
+						});
+					},
+					setSettings: function(newUserName){
+						$http.get('/config?usr=' + encodeURI(newUserName)).then(function(response){
+							settings = response.data;
+						});
+					},
+					getSettings: function(){
+						return settings;
+					}
+				};
+			}
 		};
+		
 	})
 
-	.service("questions", function(settings, utils){
+	.service("questions", function(config, utils){
+		var settings = config.getSettings();
+
 		function Question(args){
 			this.tpe = args.tpe;
 			this.operator = settings.operator[args.tpe].label;

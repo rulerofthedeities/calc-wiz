@@ -30,40 +30,52 @@
 		};
 	})
 
-	.factory("user", function($rootScope, $q, $timeout){
+	.provider("user", function(){
 		var defUser = {name:"demo"},
 			key = 'calc-wiz-user',
 			user = angular.copy(defUser);
-			
+
 		return {
-			getUserName: function(){
-				return user.name;
+			configSetUser: function(userData) {
+				if (userData){
+					user.name = userData.name;
+				}
 			},
-			getUser: function(){
-				return user;
-			},
-			login: function(newUser){
-				user.name = newUser.name;
-				$rootScope.$broadcast('user:updated', {'name':user.name});
-				this.save();
-			},
-			logout: function(){
-				user = angular.copy(defUser);
-				return user.name;
-			},
-			save: function(){
-				var toSave = {
-					'name': user.name
+			$get: function($injector) {
+				return {
+					getUserName: function(){
+						return user.name;
+					},
+					getUser: function(){
+						return user;
+					},
+					login: function(newUser){
+						user.name = newUser.name;
+
+						var rScope = $injector.get('$rootScope');  
+						rScope.$broadcast('user:updated', {'name':user.name});
+						this.save();
+					},
+					logout: function(){
+						user = angular.copy(defUser);
+						return user.name;
+					},
+					save: function(){
+						var toSave = {
+							'name': user.name
+						};
+						localStorage.setItem(key, JSON.stringify(toSave));
+					},
+					load: function(){
+						var q = $injector.get('$q'),
+							deferred = q.defer(),
+							userData = localStorage.getItem(key);
+
+						deferred.resolve(userData);
+
+						return deferred.promise;
+					}
 				};
-				localStorage.setItem(key, JSON.stringify(toSave));
-			},
-			load: function(){
-				var deferred = $q.defer();
-
-				var userData = localStorage.getItem(key);
-				deferred.resolve(userData);
-
-				return deferred.promise;
 			}
 		};
 	})
@@ -79,20 +91,45 @@
 		};
 	})
 
-	.service("config", function($http, $log, settings, configFileName){
-		this.saveConfigFile = function(callback){
-			var cb = callback;
-			$http.post('/config?file=' + encodeURI(configFileName), settings).then(function(){
-				$log.info("Saved file '" + configFileName + "'");
-				callback();
+	.provider("config", function(){
+		var settings = null;
+
+		return {
+			configSetSettings: function(newSettings) {
+				settings = newSettings;
 			},
-			function(){
-				$log.error("Error saving file '" + configFileName + "'");
-			});
+			$get: function($http, $log, user) {
+				return {
+					saveSettings: function(callback){
+						var requestData = {
+							"userName": user.getUserName(),
+							"settings": settings
+						};
+
+						$http.post('/config', requestData).then(function(){
+							callback();
+						},
+						function(){
+							$log.error("Error saving config settings.");
+						});
+					},
+					setSettings: function(newUserName){
+						$http.get('/config?usr=' + encodeURI(newUserName)).then(function(response){
+							settings = response.data;
+						});
+					},
+					getSettings: function(){
+						return settings;
+					}
+				};
+			}
 		};
+		
 	})
 
-	.service("questions", function(settings, utils){
+	.service("questions", function(config, utils){
+		var settings = config.getSettings();
+
 		function Question(args){
 			this.tpe = args.tpe;
 			this.operator = settings.operator[args.tpe].label;

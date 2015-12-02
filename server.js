@@ -5,7 +5,9 @@ var express = require('express'),
 	dbConnection = require('./server/dbconnection');
 
 app.set('port', process.env.PORT || 3300);
+app.set('defaultConfig', __dirname + '/public/json/default.config.json');
 app.use(express.static(__dirname + '/public'));
+
 app.use(bodyParser.json());
 
 app.get('/', function(request, response){

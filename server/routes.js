@@ -4,6 +4,7 @@ var config = require('../server/controllers/config'),
 module.exports.initialize = function(app, router) {
 
 	router.post('/config', config.save);
+	router.get('/config', config.load);
 	router.post('/results', results.save);
 	router.get('/results', results.retrieve);
 
