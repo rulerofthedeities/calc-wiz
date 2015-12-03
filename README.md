@@ -2,8 +2,8 @@
 Elementary-level arithmetics excercises
 
 ## Install
-npm install
-bower install
+- npm install
+- bower install
 
 ## Demo
 https://calcwiz.herokuapp.com/
