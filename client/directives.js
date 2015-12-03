@@ -104,7 +104,8 @@
 			templateUrl: DEFAULTS.templateDir + 'config.htm',
 			controllerAs: 'config',
 			controller: function($scope){
-				var settings = config.getSettings();
+				var settings = config.getSettings(),
+					self = this;
 				this.range = settings.range;
 				this.general = settings.general;
 				this.updateConfig = function(){
@@ -124,6 +125,11 @@
 					"max": kmTranslate.translate("max"),
 					"remainder": kmTranslate.translate("Remainder")
 				};
+
+				$scope.$on("settings:updated", function(event, newSettings){
+					self.range = newSettings.range;
+					self.general = newSettings.general;
+				});
 				
 			},
 			link: function(scope, element, attr) {

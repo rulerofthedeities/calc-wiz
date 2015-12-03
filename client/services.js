@@ -98,7 +98,7 @@
 			configSetSettings: function(newSettings) {
 				settings = newSettings;
 			},
-			$get: function($http, $log, user) {
+			$get: function($http, $log, $rootScope, user) {
 				return {
 					saveSettings: function(callback){
 						var requestData = {
@@ -116,6 +116,7 @@
 					setSettings: function(newUserName){
 						$http.get('/config?usr=' + encodeURI(newUserName)).then(function(response){
 							settings = response.data;
+							$rootScope.$broadcast("settings:updated", settings);
 						});
 					},
 					getSettings: function(){

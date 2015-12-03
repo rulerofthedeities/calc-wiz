@@ -13,17 +13,6 @@ kmCalc.constant("DEFAULTS",{
 		]
 });
 
-/*
-.run(function(user){
-	user.load().then(function(userData){
-		if (userData){
-			userData = JSON.parse(userData);
-			user.login(userData);
-		}
-	});
-});
-*/
-
 //Load json files and bootstrap
 angular.element(document).ready(function () {
 	var initInjector = angular.injector(['ng']),
@@ -76,21 +65,6 @@ angular.element(document).ready(function () {
 
 	app
 	.config(function($routeProvider){
-		/*
-		var translationResolve = ['kmTranslateFile', 
-			function(kmTranslateFile){
-				return kmTranslateFile.promise(); 
-		}],
-		customRouteProvider = angular.extend({}, $routeProvider, {
-			when: function(path, route) {
-				route.resolve = (route.resolve) ? route.resolve : {};
-				angular.extend(route.resolve, translationResolve);
-				$routeProvider.when(path, route);
-				this.$inject = ['path', 'route'];
-				return this;
-			}
-		});
-*/
 
 		$routeProvider.when('/', {
 			templateUrl: 'views/menu.htm' 
@@ -342,7 +316,8 @@ angular.element(document).ready(function () {
 			templateUrl: DEFAULTS.templateDir + 'config.htm',
 			controllerAs: 'config',
 			controller: function($scope){
-				var settings = config.getSettings();
+				var settings = config.getSettings(),
+					self = this;
 				this.range = settings.range;
 				this.general = settings.general;
 				this.updateConfig = function(){
@@ -362,6 +337,11 @@ angular.element(document).ready(function () {
 					"max": kmTranslate.translate("max"),
 					"remainder": kmTranslate.translate("Remainder")
 				};
+
+				$scope.$on("settings:updated", function(event, newSettings){
+					self.range = newSettings.range;
+					self.general = newSettings.general;
+				});
 				
 			},
 			link: function(scope, element, attr) {
@@ -691,7 +671,7 @@ angular.element(document).ready(function () {
 			configSetSettings: function(newSettings) {
 				settings = newSettings;
 			},
-			$get: function($http, $log, user) {
+			$get: function($http, $log, $rootScope, user) {
 				return {
 					saveSettings: function(callback){
 						var requestData = {
@@ -709,6 +689,7 @@ angular.element(document).ready(function () {
 					setSettings: function(newUserName){
 						$http.get('/config?usr=' + encodeURI(newUserName)).then(function(response){
 							settings = response.data;
+							$rootScope.$broadcast("settings:updated", settings);
 						});
 					},
 					getSettings: function(){

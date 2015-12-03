@@ -4,21 +4,6 @@
 
 	app
 	.config(function($routeProvider){
-		/*
-		var translationResolve = ['kmTranslateFile', 
-			function(kmTranslateFile){
-				return kmTranslateFile.promise(); 
-		}],
-		customRouteProvider = angular.extend({}, $routeProvider, {
-			when: function(path, route) {
-				route.resolve = (route.resolve) ? route.resolve : {};
-				angular.extend(route.resolve, translationResolve);
-				$routeProvider.when(path, route);
-				this.$inject = ['path', 'route'];
-				return this;
-			}
-		});
-*/
 
 		$routeProvider.when('/', {
 			templateUrl: 'views/menu.htm' 

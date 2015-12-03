@@ -13,17 +13,6 @@ kmCalc.constant("DEFAULTS",{
 		]
 });
 
-/*
-.run(function(user){
-	user.load().then(function(userData){
-		if (userData){
-			userData = JSON.parse(userData);
-			user.login(userData);
-		}
-	});
-});
-*/
-
 //Load json files and bootstrap
 angular.element(document).ready(function () {
 	var initInjector = angular.injector(['ng']),
