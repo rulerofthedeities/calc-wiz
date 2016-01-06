@@ -3,21 +3,21 @@ var mongo = require('mongodb'),
 	fs = require('fs');
 
 
-loadConfigFile = function(fileName, callback){
+var loadConfigFile = function(fileName, callback){
 	fs.readFile(fileName, function (err, response) {
 		assert.equal(null, err);
 		callback(JSON.parse(response.toString()));
 	});
 };
 
-findConfigDoc = function(db, filter, callback){
+var findConfigDoc = function(db, filter, callback){
 	db.collection('config').find(filter, {'settings': true, '_id':false}).limit(1).next(function(err, doc) {
 		assert.equal(null, err);
 		callback(doc);
     });
 };
 
-upsertConfigDoc = function(db, data){
+var upsertConfigDoc = function(db, data){
 	db.collection('config').updateOne(
 		{"name": data.userName}, 
 		{$set:{ "settings": data.settings}},

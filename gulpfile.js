@@ -12,15 +12,15 @@ var gulp = require('gulp'),
 		config.bowerDir + 'angular-route/angular-route.js',
 		config.bowerDir + 'angular-media-player/dist/angular-media-player.js',
 		config.bowerDir + 'angular-bootstrap/ui-bootstrap-tpls.js',
-		config.bowerDir + 'angular-animate/angular-animate.js'];
+		config.bowerDir + 'angular-animate/angular-animate.js'],
 
 	vendorCSS 	= [
 		config.bowerDir + 'bootstrap/dist/css/bootstrap.min.css',
-		config.bowerDir + 'font-awesome/css/font-awesome.min.css'];
+		config.bowerDir + 'font-awesome/css/font-awesome.min.css'],
 
 	vendorFonts = [
 		config.bowerDir + '/font-awesome/fonts/**.*',
-		config.bowerDir + '/bootstrap/fonts/**.*'];
+		config.bowerDir + '/bootstrap/fonts/**.*'],
 
 	clientJS = [
 		'client.js',

@@ -97,7 +97,7 @@
 		};
 	})
 
-	.directive("calcConfig", function(config, DEFAULTS, kmTranslate, kmTranslateConfig){
+	.directive("calcConfig", function(config, DEFAULTS, kmTranslate, kmTranslateConfig, kmTranslateFile){
 		return{
 			restrict: 'E',
 			replace: true,

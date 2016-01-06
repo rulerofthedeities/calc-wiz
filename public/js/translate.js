@@ -59,7 +59,7 @@ angular.module('km.translate', [])
 			if(!~DEFAULTS.FORMATS.indexOf(format)){
 				format = DEFAULTS.FORMAT;
 			}
-			formatType = format;
+			formatType = format; 
 		},
 		configSetTranslationTable: function (newTranslationTable) {
 			translationTableFromObject = newTranslationTable;
@@ -118,6 +118,7 @@ angular.module('km.translate', [])
 			cas = options['case'];
 
 			if (translateTable && translateTable[format[0]] && translateTable[format[0]][format[1]]){
+				
 				if (cas && translateTable[format[0]][format[1]][cas]){
 					//Case is requested and found
 					translation = translateTable[format[0]][format[1]][cas];

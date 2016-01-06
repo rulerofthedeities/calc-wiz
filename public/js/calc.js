@@ -66,7 +66,21 @@ angular.element(document).ready(function () {
 	app
 	.config(function($routeProvider){
 
-		$routeProvider.when('/', {
+		var translationResolve = ['kmTranslateFile', 
+			function(kmTranslateFile){
+				return kmTranslateFile.promise(); 
+		}],
+		customRouteProvider = angular.extend({}, $routeProvider, {
+			when: function(path, route) {
+				route.resolve = (route.resolve) ? route.resolve : {};
+				angular.extend(route.resolve, translationResolve);
+				$routeProvider.when(path, route);
+				this.$inject = ['path', 'route'];
+				return this;
+			}
+		});
+
+		customRouteProvider.when('/', {
 			templateUrl: 'views/menu.htm' 
 		}).when('/exercises/:type', {
 			templateUrl: 'views/exercises.htm',
@@ -309,7 +323,7 @@ angular.element(document).ready(function () {
 		};
 	})
 
-	.directive("calcConfig", function(config, DEFAULTS, kmTranslate, kmTranslateConfig){
+	.directive("calcConfig", function(config, DEFAULTS, kmTranslate, kmTranslateConfig, kmTranslateFile){
 		return{
 			restrict: 'E',
 			replace: true,
